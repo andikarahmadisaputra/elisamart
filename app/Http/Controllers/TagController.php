@@ -29,7 +29,7 @@ class TagController extends Controller
      */
     public function index(): View
     {
-        $products = Tag::latest()->paginate(5);
+        $tags = Tag::latest()->paginate(5);
 
         return view('tags.index',compact('tags'))
             ->with('i', (request()->input('page', 1) - 1) * 5);
@@ -58,7 +58,7 @@ class TagController extends Controller
             'detail' => 'required',
         ]);
     
-        Product::create($request->all());
+        Tag::create($request->all());
     
         return redirect()->route('tags.index')
                         ->with('success','Tag created successfully.');
