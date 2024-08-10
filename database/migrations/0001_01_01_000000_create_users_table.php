@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('nik')->unique();
             $table->enum('gender', ['pria', 'wanita']);
             $table->decimal('balance', total: 12, places: 2)->default(0);
-            $table->integer('pin');
+            $table->varchar('pin');
             $table->rememberToken();
             $table->timestamps();
         });

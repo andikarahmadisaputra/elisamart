@@ -52,11 +52,15 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
-            'roles' => 'required'
+            'roles' => 'required',
+            'nik' => 'required|unique:users,nik',
+            'gender' => ['required', 'in:pria,wanita'],
+            'pin' => ['required', 'string', 'size:6', 'regex:/^[0-9]+$/']
         ]);
     
         $input = $request->all();
         $input['password'] = Hash::make($input['password']);
+        $input['pin'] = Hash::make($input['pin']);
     
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
