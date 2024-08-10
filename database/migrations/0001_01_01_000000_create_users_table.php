@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('nik')->unique();
+            $table->enum('gender', ['pria', 'wanita']);
+            $table->decimal('balance', total: 12, places: 2);
+            $table->integer('pin');
             $table->rememberToken();
             $table->timestamps();
         });
