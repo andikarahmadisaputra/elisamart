@@ -64,6 +64,27 @@
                 </select>
             </div>
         </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <strong>NIK:</strong>
+                <input type="text" name="nik" placeholder="NIK" class="form-control" value="{{ $user->nik }}">
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <strong>Gender:</strong>
+                <select name="gender" class="form-control">
+                    <option value="pria" {{ $user->gender === 'pria' ? 'selected' : '' }}>Pria</option>
+                    <option value="wanita" {{ $user->gender === 'wanita' ? 'selected' : '' }}>Wanita</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <strong>PIN:</strong>
+                <input type="text" name="pin" placeholder="PIN" class="form-control">
+            </div>
+        </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
             <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
         </div>

@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('tags', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('detail');
-            $table->bigInteger('created_by');
-            $table->bigInteger('updated_by');
+            $table->string('name', 50);
+            $table->text('detail')->nullable();
+            $table->bigInteger('created_by')->nullable();
+            $table->bigInteger('updated_by')->nullable();
             $table->timestamps();
         });
     }

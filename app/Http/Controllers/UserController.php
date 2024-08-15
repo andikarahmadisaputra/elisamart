@@ -51,16 +51,19 @@ class UserController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|same:confirm-password',
+            'password' => 'required|string|same:confirm-password',
             'roles' => 'required',
-            'nik' => 'required|unique:users,nik',
-            'gender' => ['required', 'in:pria,wanita'],
-            'pin' => ['required', 'string', 'size:6', 'regex:/^[0-9]+$/']
+            'nik' => 'nullable|unique:users,nik',
+            'phone' => 'nullable|string|regex:/^\d{10,13}$/',
+            'gender' => 'nullable|in:pria,wanita',
+            'pin' => 'nullable|string|size:6|regex:/^[0-9]+$/',
         ]);
     
         $input = $request->all();
         $input['password'] = Hash::make($input['password']);
-        $input['pin'] = Hash::make($input['pin']);
+        if (!empty($input['pin'])) {
+            $input['pin'] = Hash::make($input['pin']);
+        }
     
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
@@ -109,8 +112,12 @@ class UserController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,'.$id,
-            'password' => 'same:confirm-password',
-            'roles' => 'required'
+            'password' => 'nullable|string|same:confirm-password',
+            'roles' => 'required',
+            'nik' => 'nullable|unique:users,nik',
+            'phone' => 'nullable|string|regex:/^\d{10,13}$/',
+            'gender' => 'nullable|in:pria,wanita',
+            'pin' => 'nullable|string|size:6|regex:/^[0-9]+$/'
         ]);
     
         $input = $request->all();
@@ -118,6 +125,20 @@ class UserController extends Controller
             $input['password'] = Hash::make($input['password']);
         }else{
             $input = Arr::except($input,array('password'));    
+        }
+
+        if(!empty($input['pin'])){ 
+            $input['pin'] = Hash::make($input['pin']);
+        }else{
+            $input = Arr::except($input,array('pin'));    
+        }
+
+        if(empty($input['nik'])){
+            $input = Arr::except($input,array('nik'));
+        }
+
+        if(empty($input['gender'])){
+            $input = Arr::except($input,array('gender'));
         }
     
         $user = User::find($id);
@@ -139,6 +160,7 @@ class UserController extends Controller
     public function destroy($id): RedirectResponse
     {
         User::find($id)->delete();
+        DB::table('model_has_roles')->where('model_id',$id)->delete();
         return redirect()->route('users.index')
                         ->with('success','User deleted successfully');
     }

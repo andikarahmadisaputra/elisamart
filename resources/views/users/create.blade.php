@@ -29,19 +29,19 @@
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Name:</strong>
-                <input type="text" name="name" placeholder="Name" class="form-control">
+                <input type="text" name="name" placeholder="Name" class="form-control" value="{{ old('name') }}">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Email:</strong>
-                <input type="email" name="email" placeholder="Email" class="form-control">
+                <input type="email" name="email" placeholder="Email" class="form-control" value="{{ old('email') }}">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>Password:</strong>
-                <input type="password" name="password" placeholder="Password" class="form-control">
+                <input type="password" name="password" placeholder="Password" class="form-control" value="{{ old('password') }}">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
@@ -60,6 +60,27 @@
                         </option>
                      @endforeach
                 </select>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <strong>NIK:</strong>
+                <input type="text" name="nik" placeholder="NIK" class="form-control" value="{{ old('nik') }}">
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <strong>Gender:</strong>
+                <select name="gender" class="form-control">
+                    <option value="pria">Pria</option>
+                    <option value="wanita">Wanita</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <strong>PIN:</strong>
+                <input type="text" name="pin" placeholder="PIN" class="form-control" value="{{ old('pin') }}">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
