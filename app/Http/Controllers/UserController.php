@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Tag;
 use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
@@ -15,6 +16,19 @@ use Illuminate\Http\RedirectResponse;
 
 class UserController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    function __construct()
+    {
+         $this->middleware('permission:user-list|user-create|user-edit|user-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:user-create', ['only' => ['create','store']]);
+         $this->middleware('permission:user-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:user-delete', ['only' => ['destroy']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -36,8 +50,9 @@ class UserController extends Controller
     public function create(): View
     {
         $roles = Role::pluck('name','name')->all();
+        $tags = Tag::all();
 
-        return view('users.create',compact('roles'));
+        return view('users.create',compact('roles', 'tags'));
     }
     
     /**
@@ -57,6 +72,7 @@ class UserController extends Controller
             'phone' => 'nullable|string|regex:/^\d{10,13}$/',
             'gender' => 'nullable|in:pria,wanita',
             'pin' => 'nullable|string|size:6|regex:/^[0-9]+$/',
+            'tags' => 'array',
         ]);
     
         $input = $request->all();
@@ -67,6 +83,9 @@ class UserController extends Controller
     
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
+        if ($request->has('tags')) {
+            $user->tags()->sync($request->tags);
+        }
     
         return redirect()->route('users.index')
                         ->with('success','User created successfully');
@@ -96,8 +115,10 @@ class UserController extends Controller
         $user = User::find($id);
         $roles = Role::pluck('name','name')->all();
         $userRole = $user->roles->pluck('name','name')->all();
+        $tags = Tag::all();
+        $selectedTags = $user->tags->pluck('id')->toArray();
     
-        return view('users.edit',compact('user','roles','userRole'));
+        return view('users.edit',compact('user','roles','userRole', 'tags', 'selectedTags'));
     }
     
     /**
@@ -114,10 +135,11 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,'.$id,
             'password' => 'nullable|string|same:confirm-password',
             'roles' => 'required',
-            'nik' => 'nullable|unique:users,nik',
+            'nik' => 'nullable|unique:users,nik,'.$id,
             'phone' => 'nullable|string|regex:/^\d{10,13}$/',
             'gender' => 'nullable|in:pria,wanita',
-            'pin' => 'nullable|string|size:6|regex:/^[0-9]+$/'
+            'pin' => 'nullable|string|size:6|regex:/^[0-9]+$/',
+            'tags' => 'array',
         ]);
     
         $input = $request->all();
@@ -133,19 +155,23 @@ class UserController extends Controller
             $input = Arr::except($input,array('pin'));    
         }
 
-        if(empty($input['nik'])){
-            $input = Arr::except($input,array('nik'));
-        }
-
         if(empty($input['gender'])){
             $input = Arr::except($input,array('gender'));
         }
     
         $user = User::find($id);
+
+        if (empty($input['nik']) || $input['nik'] == $user->nik) {
+            $input = Arr::except($input,array('nik'));
+        }
+
         $user->update($input);
         DB::table('model_has_roles')->where('model_id',$id)->delete();
     
         $user->assignRole($request->input('roles'));
+        if ($request->has('tags')) {
+            $user->tags()->sync($request->tags);
+        }
     
         return redirect()->route('users.index')
                         ->with('success','User updated successfully');

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 <div class="row">
@@ -52,6 +52,4 @@
 </table>
 
 {!! $tags->links() !!}
-
-<p class="text-center text-primary"><small>Elisamart</small></p>
 @endsection

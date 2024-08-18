@@ -1,13 +1,13 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 <div class="row">
     <div class="col-lg-12 margin-tb">
         <div class="pull-left">
-            <h2>Users Management</h2>
+            <h2>{{ __('master.user.index.title') }}</h2>
         </div>
         <div class="pull-right">
-            <a class="btn btn-success mb-2" href="{{ route('users.create') }}"><i class="fa fa-plus"></i> Create New User</a>
+            <a class="btn btn-success mb-2" href="{{ route('users.create') }}"><i class="fa fa-plus"></i> {{ __('master.user.button.add') }}</a>
         </div>
     </div>
 </div>
@@ -18,41 +18,66 @@
     </div>
 @endsession
 
-<table class="table table-bordered">
-   <tr>
-       <th>No</th>
-       <th>Name</th>
-       <th>Email</th>
-       <th>Roles</th>
-       <th width="280px">Action</th>
-   </tr>
-   @foreach ($data as $key => $user)
-    <tr>
-        <td>{{ ++$i }}</td>
-        <td>{{ $user->name }}</td>
-        <td>{{ $user->email }}</td>
-        <td>
-          @if(!empty($user->getRoleNames()))
-            @foreach($user->getRoleNames() as $v)
-               <label class="badge bg-success">{{ $v }}</label>
-            @endforeach
-          @endif
-        </td>
-        <td>
-             <a class="btn btn-info btn-sm" href="{{ route('users.show',$user->id) }}"><i class="fa-solid fa-list"></i> Show</a>
-             <a class="btn btn-primary btn-sm" href="{{ route('users.edit',$user->id) }}"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
-              <form method="POST" action="{{ route('users.destroy', $user->id) }}" style="display:inline">
-                  @csrf
-                  @method('DELETE')
+<div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+        <thead>
+            <tr>
+                <th>{{ __('master.user.table.no') }}</th>
+                <th>{{ __('master.user.table.name') }}</th>
+                <th>{{ __('master.user.table.email') }}</th>
+                <th>{{ __('master.user.table.role') }}</th>
+                <th>{{ __('master.user.table.tag') }}</th>
+                <th>{{ __('master.user.table.nik') }}</th>
+                <th>{{ __('master.user.table.phone') }}</th>
+                <th>{{ __('master.user.table.balance') }}</th>
+                <th width="280px">{{ __('master.user.table.action') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach ($data as $key => $user)
+            <tr>
+                <td>{{ ++$i }}</td>
+                <td>{{ $user->name }}</td>
+                <td>{{ $user->email }}</td>
+                <td>
+                @if(!empty($user->getRoleNames()))
+                    @foreach($user->getRoleNames() as $v)
+                    <label class="badge bg-success">{{ $v }}</label>
+                    @endforeach
+                @endif
+                </td>
+                <td>
+                @if(!empty($user->tags()))
+                    @foreach($user->tags as $v)
+                    <label class="badge bg-success">{{ $v->name }}</label>
+                    @endforeach
+                @endif
+                </td>
+                <td>
+                @if(!empty($user->nik))
+                    {{ $user->nik }}
+                @endif
+                </td>
+                <td>
+                @if(!empty($user->nik))
+                    {{ $user->phone }}
+                @endif
+                </td>
+                <td>{{ sprintf("%.2f", $user->balance) }}</td>
+                <td>
+                    <a class="btn btn-info btn-sm" href="{{ route('users.show',$user->id) }}"><i class="fa-solid fa-list"></i> {{ __('master.user.button.show') }}</a>
+                    <a class="btn btn-primary btn-sm" href="{{ route('users.edit',$user->id) }}"><i class="fa-solid fa-pen-to-square"></i> {{ __('master.user.button.edit') }}</a>
+                    <form method="POST" action="{{ route('users.destroy', $user->id) }}" style="display:inline">
+                        @csrf
+                        @method('DELETE')
 
-                  <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</button>
-              </form>
-        </td>
-    </tr>
- @endforeach
-</table>
-
+                        <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> {{ __('master.user.button.delete') }}</button>
+                    </form>
+                </td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
+</div>
 {!! $data->links('pagination::bootstrap-5') !!}
-
-<p class="text-center text-primary"><small>Elisamart</small></p>
 @endsection

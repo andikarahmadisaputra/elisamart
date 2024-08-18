@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 <div class="row">
@@ -26,6 +26,4 @@
         </div>
     </div>
 </div>
-
-<p class="text-center text-primary"><small>Elisamart</small></p>
 @endsection

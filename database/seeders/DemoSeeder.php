@@ -14,6 +14,7 @@ class DemoSeeder extends Seeder
     {
         $this->call([
             PermissionTableSeeder::class,
+            TagTableSeeder::class,
             CreateAdminUserSeeder::class,
         ]);
     }

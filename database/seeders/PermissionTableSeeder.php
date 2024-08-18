@@ -22,11 +22,19 @@ class PermissionTableSeeder extends Seeder
             'tag-list',
             'tag-create',
             'tag-edit',
-            'tag-delete'
-         ];
+            'tag-delete',
+            'user-list',
+            'user-create',
+            'user-edit',
+            'user-delete',
+            'store-list',
+            'store-create',
+            'store-edit',
+            'store-delete',
+        ];
          
-         foreach ($permissions as $permission) {
-              Permission::create(['name' => $permission]);
-         }
+        foreach ($permissions as $permission) {
+            Permission::create(['name' => $permission]);
+        }
     }
 }

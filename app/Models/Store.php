@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Tag extends Model
+class Store extends Model
 {
     use HasFactory;
 
@@ -33,13 +33,8 @@ class Tag extends Model
     }
 
     protected $fillable = [
-        'name', 'detail'
+        'name', 'balance'
     ];
-
-    public function users()
-    {
-        return $this->belngsToMany(User::class);
-    }
 
     public function createdBy()
     {

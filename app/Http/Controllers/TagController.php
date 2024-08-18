@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Tag;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -22,14 +21,15 @@ class TagController extends Controller
          $this->middleware('permission:tag-edit', ['only' => ['edit','update']]);
          $this->middleware('permission:tag-delete', ['only' => ['destroy']]);
     }
+    
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $tags = Tag::latest()->paginate(5);
+        $tags = Tag::select(['id', 'name', 'detail'])->latest()->paginate(5);
 
         return view('tags.index',compact('tags'))
             ->with('i', (request()->input('page', 1) - 1) * 5);

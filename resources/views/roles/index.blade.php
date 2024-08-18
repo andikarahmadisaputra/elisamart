@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 <div class="row">
@@ -50,6 +50,4 @@
 </table>
 
 {!! $roles->links('pagination::bootstrap-5') !!}
-
-<p class="text-center text-primary"><small>Elisamart</small></p>
 @endsection
