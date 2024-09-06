@@ -16,6 +16,7 @@ class DemoSeeder extends Seeder
             PermissionTableSeeder::class,
             TagTableSeeder::class,
             CreateAdminUserSeeder::class,
+            StoreTableSeeder::class,
         ]);
     }
 }

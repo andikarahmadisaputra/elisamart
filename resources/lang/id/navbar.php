@@ -18,14 +18,14 @@ return [
     'transaction' => [
         'topup_store' => 'Isi Ulang Saldo Toko',
         'approve_store' => 'Persetujuan Isi Ulang Saldo Toko',
-        'topup_member' => 'Isi Ulang Saldo Member',
-        'approve_member' => 'Persetujuan Isi Ulang Saldo Member',
+        'topup_user' => 'Isi Ulang Saldo Pengguna',
+        'approve_user' => 'Persetujuan Isi Ulang Saldo Pengguna',
         'payment_request' => 'Permintaan Pembayaran',
     ],
     'report' => [
         'user_summary' => 'Rekap Pengguna',
         'topup_store' => 'Isi Ulang Saldo Toko',
-        'topup_member' => 'Isi Ulang Saldo Member',
+        'topup_user' => 'Isi Ulang Saldo pengguna',
         'received_payment' => 'Pembayaran Diterima',
         'mutation' => 'Rekap Mutasi',
     ],

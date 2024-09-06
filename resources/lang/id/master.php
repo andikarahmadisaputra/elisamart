@@ -138,6 +138,7 @@ return [
         'form' => [
             'name' => 'Nama',
             'detail' => 'Keterangan',
+            'balance' => 'Saldo',
         ],
     ],
     'promo' => [

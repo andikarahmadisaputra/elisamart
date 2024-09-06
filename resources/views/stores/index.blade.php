@@ -6,9 +6,11 @@
         <div class="pull-left">
             <h2>{{ __('master.store.index.title') }}</h2>
         </div>
+        @can('store.create')
         <div class="pull-right">
             <a class="btn btn-success mb-2" href="{{ route('stores.create') }}"><i class="fa fa-plus"></i> {{ __('master.store.button.add') }}</a>
         </div>
+        @endcan
     </div>
 </div>
 
@@ -35,16 +37,20 @@
                 <td>{{ ++$i }}</td>
                 <td>{{ $store->name }}</td>
                 <td>{{ $store->detail }}</td>
-                <td>{{ sprintf("%.2f", $store->balance) }}</td>
+                <td>Rp {{ number_format($store->balance, 0, ',', '.') }}</td>
                 <td>
                     <a class="btn btn-info btn-sm" href="{{ route('stores.show',$store->id) }}"><i class="fa-solid fa-list"></i> {{ __('master.store.button.show') }}</a>
+                    @can('store.edit')
                     <a class="btn btn-primary btn-sm" href="{{ route('stores.edit',$store->id) }}"><i class="fa-solid fa-pen-to-square"></i> {{ __('master.store.button.edit') }}</a>
+                    @endcan
+                    @can('store.delete')
                     <form method="POST" action="{{ route('stores.destroy', $store->id) }}" style="display:inline">
                         @csrf
                         @method('DELETE')
 
                         <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> {{ __('master.store.button.delete') }}</button>
                     </form>
+                    @endcan
                 </td>
             </tr>
         @endforeach

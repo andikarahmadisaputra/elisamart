@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name', 50);
             $table->string('detail')->nullable();
             $table->decimal('balance', total: 12, places: 2)->default(0);
+            $table->decimal('balance_in', total: 12, places: 2)->default(0);
             $table->bigInteger('created_by')->nullable();
             $table->bigInteger('updated_by')->nullable();
             $table->timestamps();

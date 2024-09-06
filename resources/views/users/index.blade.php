@@ -6,9 +6,11 @@
         <div class="pull-left">
             <h2>{{ __('master.user.index.title') }}</h2>
         </div>
+        @can('user.create')
         <div class="pull-right">
             <a class="btn btn-success mb-2" href="{{ route('users.create') }}"><i class="fa fa-plus"></i> {{ __('master.user.button.add') }}</a>
         </div>
+        @endcan
     </div>
 </div>
 
@@ -63,16 +65,22 @@
                     {{ $user->phone }}
                 @endif
                 </td>
-                <td>{{ sprintf("%.2f", $user->balance) }}</td>
+                <td>Rp {{ number_format($user->balance, 0, ',', '.') }}</td>
                 <td>
+                    @can('user.show')
                     <a class="btn btn-info btn-sm" href="{{ route('users.show',$user->id) }}"><i class="fa-solid fa-list"></i> {{ __('master.user.button.show') }}</a>
+                    @endcan
+                    @can('user.edit')
                     <a class="btn btn-primary btn-sm" href="{{ route('users.edit',$user->id) }}"><i class="fa-solid fa-pen-to-square"></i> {{ __('master.user.button.edit') }}</a>
+                    @endcan
+                    @can('user.delete')
                     <form method="POST" action="{{ route('users.destroy', $user->id) }}" style="display:inline">
                         @csrf
                         @method('DELETE')
 
                         <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> {{ __('master.user.button.delete') }}</button>
                     </form>
+                    @endcan
                 </td>
             </tr>
         @endforeach

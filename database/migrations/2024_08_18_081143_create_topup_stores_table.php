@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tags', function (Blueprint $table) {
+        Schema::create('topup_stores', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 50);
-            $table->text('detail')->nullable();
+            $table->string('transaction_number')->unique();
+            $table->decimal('amount', total: 12, places: 2)->default(0);
+            $table->string('note')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected', 'under review', 'canceled'])->default('pending');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
+
+            $table->foreignId('store_id')->constrained()->onDelete('restrict');
         });
     }
 
@@ -26,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tags');
+        Schema::dropIfExists('topup_stores');
     }
 };

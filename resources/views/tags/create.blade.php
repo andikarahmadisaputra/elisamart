@@ -4,10 +4,10 @@
 <div class="row">
     <div class="col-lg-12 margin-tb">
         <div class="pull-left">
-            <h2>Add New Tag</h2>
+            <h2>{{ __('master.tag.create.title') }}</h2>
         </div>
         <div class="pull-right">
-            <a class="btn btn-primary btn-sm mb-2" href="{{ route('tags.index') }}"><i class="fa fa-arrow-left"></i> Back</a>
+            <a class="btn btn-primary btn-sm mb-2" href="{{ route('tags.index') }}"><i class="fa fa-arrow-left"></i> {{ __('master.tag.button.cancel') }}</a>
         </div>
     </div>
 </div>
@@ -29,18 +29,18 @@
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>Name:</strong>
+                <strong>{{ __('master.tag.form.name') }}:</strong>
                 <input type="text" name="name" class="form-control" placeholder="Name">
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>Detail:</strong>
+                <strong>{{ __('master.tag.form.detail') }}:</strong>
                 <textarea class="form-control" style="height:150px" name="detail" placeholder="Detail"></textarea>
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
-                <button type="submit" class="btn btn-primary btn-sm mb-3 mt-2"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
+                <button type="submit" class="btn btn-primary btn-sm mb-3 mt-2"><i class="fa-solid fa-floppy-disk"></i> {{ __('master.tag.button.submit') }}</button>
         </div>
     </div>
 </form>

@@ -49,7 +49,7 @@
                                 </li>
                             @endif
                         @else
-                            @if(Gate::any(['user.list', 'store.list', 'role.list', 'tag.list']))
+                            @if(Gate::any(['transaction.payment', 'transfer', 'role.list', 'tag.list']))
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.master') }}</a>
                                 <ul class="dropdown-menu">
@@ -175,7 +175,7 @@
                 <hr>
                 <div class="row">
                     <div class="col-md-6">
-                        <p>&copy; 2024 Aneka Jaya Smart. All Rights Reserved.</p>
+                        <p>&copy; 2024 ElisaMart. All Rights Reserved.</p>
                     </div>
                     <div class="col-md-6 text-md-end">
                         <a href="#" class="me-2">Facebook</a>
