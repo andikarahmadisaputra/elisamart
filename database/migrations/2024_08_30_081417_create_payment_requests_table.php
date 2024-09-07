@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedbigInteger('user_id');
             $table->decimal('amount', total: 12, places: 2)->default(0);
             $table->string('note')->nullable();
-            $table->enum('status', ['awaiting payment', 'canceled', 'paid'])->default('awaiting_payment');
+            $table->enum('status', ['awaiting payment', 'canceled', 'paid'])->default('awaiting payment');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
