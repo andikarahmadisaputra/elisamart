@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('payment_requests', function (Blueprint $table) {
             $table->id();
             $table->string('transaction_number')->unique();
-            $table->unsignedbigInteger('store_id');
-            $table->unsignedbigInteger('user_id');
             $table->decimal('amount', total: 12, places: 2)->default(0);
             $table->string('note')->nullable();
             $table->enum('status', ['awaiting payment', 'canceled', 'paid'])->default('awaiting payment');
