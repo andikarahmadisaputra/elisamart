@@ -39,6 +39,55 @@ class MemberController extends Controller
 
     public function updatePin(Request $request): RedirectResponse
     {
+        $request->validate([
+            'old_pin' => 'nullable|string|size:6|regex:/^[0-9]+$/',
+            'pin' => 'required|string|size:6|regex:/^[0-9]+$/|same:confirm_pin',
+            'confirm_pin' => 'required|string|size:6|regex:/^[0-9]+$/',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $user = User::findOrFail(Auth::user()->id);
+
+            if (empty($user->pin)) {
+                // If there's no existing PIN, hash and save the new PIN
+                $user->pin = bcrypt($request->input('pin'));
+                $user->save();
+                DB::commit();
+
+                return redirect()->route('member.profile')->with('success', 'PIN created successfully');
+            } else {
+                // Verify old PIN
+                if (Hash::check($request->input('old_pin'), $user->pin)) {
+                    $user->pin = bcrypt($request->input('pin'));
+                    $user->save();
+                    DB::commit();
+
+                    return redirect()->route('member.profile')->with('success', 'PIN updated successfully');
+                } else {
+                    DB::rollBack();
+                    return redirect()->back()->with('error', 'Old PIN does not match');
+                }
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Update PIN creation failed.', [
+                'error_message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'stack_trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()->with('error', 'Error updating PIN. Please try again.');
+        }
+    }
+
+    public function updatePin2(Request $request): RedirectResponse
+    {
         if (!empty(Auth::user()->pin)) {
             $this->validate($request, [
                 'old_pin' => 'required|string|size:6|regex:/^[0-9]+$/',
@@ -113,7 +162,81 @@ class MemberController extends Controller
     {
         $payment = PaymentRequest::where('id', $id)->first();
 
-        if ($payment->status != 'awaiting_payment') {
+        if ($payment->status != 'awaiting payment') {
+            return redirect()->route('member.payment_detail', $id);
+        }
+        
+        $request->validate([
+            'voucher' => 'required|numeric|min:0',
+            'pin' => 'required|string|size:6|regex:/^[0-9]+$/',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // First, check if the voucher is valid
+            $voucherAmount = $request->input('voucher');
+            $userBalance = Auth::user()->balance;
+
+            if ($voucherAmount < 0) {
+                Log::info('Voucher less than zero: ' . $request->input('voucher'));
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Voucher yang digunakan tidak boleh kurang dari 0');
+            }
+
+            if ($voucherAmount > $userBalance) {
+                Log::info('Voucher more than user balance: ' . $request->input('voucher'));
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Voucher yang digunakan tidak boleh lebih dari ' . $userBalance);
+            }
+
+            // Now, check the PIN
+            if (Hash::check($request->input('pin'), Auth::user()->pin)) {
+                // All checks passed, proceed with payment
+                $paymentRequest = PaymentRequest::findOrFail($id);
+                $paymentRequest->status = 'paid';
+                $paymentRequest->voucher = $voucherAmount;
+                $paymentRequest->save();
+
+                $user = User::findOrFail(Auth::user()->id);
+                $user->balance -= $voucherAmount;
+                $user->save();
+
+                $store = Store::findOrFail($paymentRequest->store_id);
+                $store->balance_in += $voucherAmount;
+                $store->save();
+
+                DB::commit();
+
+                return redirect()->route('member.payment_detail', $id)->with('success', 'Pembayaran Berhasil');
+            } else {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'PIN yang Anda masukkan salah');
+            }
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Update PIN creation failed.', [
+                'error_message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'stack_trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'user_id' => Auth::id(),
+                'payment_request_id' => $id,
+            ]);
+
+            return redirect()->back()->with('error', 'Pembayaran gagal, silahkan hubungi Admin');
+        }
+    }
+
+
+    public function pay2(Request $request, $id)
+    {
+        $payment = PaymentRequest::where('id', $id)->first();
+
+        if ($payment->status != 'awaiting payment') {
             return redirect()->route('member.payment_detail', $id);
         }
         
@@ -146,11 +269,11 @@ class MemberController extends Controller
                 DB::rollBack();
 
                 return redirect()->back()->with('error', 'PIN yang Anda masukkan salah');
-            } elseif ($request->input('voucher') <= 0) {
+            } elseif ($request->input('voucher') < 0) {
                 DB::rollBack();
 
                 return redirect()->back()->with('error', 'Voucher yang digunakan tidak boleh kurang dari 0');
-            } elseif ($request->input('voucher') >= Auth::user()->balance) {
+            } elseif ($request->input('voucher') > Auth::user()->balance) {
                 DB::rollBack();
 
                 return redirect()->back()->with('error', 'Voucher yang digunakan tidak boleh lebih dari '. Auth::user()->balance);
@@ -169,7 +292,6 @@ class MemberController extends Controller
                 'user_id' => Auth::id(),
                 'payment_request_id' => PaymentRequest::find($id),
             ]);
-
 
             return redirect()->back()->with('error', 'Pembayaran gagal, silahkan hubungi Admin');
         }

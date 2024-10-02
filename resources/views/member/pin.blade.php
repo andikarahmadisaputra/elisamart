@@ -3,11 +3,11 @@
 @section('content')
     <div class="container mt-4">
 
-        @session('error')
+        @if(session('error'))
             <div class="alert alert-danger" role="alert"> 
-                {{ $value }}
+                {{ session('error') }}
             </div>
-        @endsession
+        @endif
 
         @if(empty(Auth::user()->pin))
 

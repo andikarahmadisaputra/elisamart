@@ -59,7 +59,7 @@ class PaymentRequest extends Model
     }
 
     protected $fillable = [
-        'store_id', 'user_id', 'amount', 'status', 'voucher'
+        'store_id', 'user_id', 'amount', 'status', 'voucher', 'note'
     ];
 
     public function createdBy()

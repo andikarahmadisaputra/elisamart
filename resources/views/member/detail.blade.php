@@ -1,46 +1,45 @@
 @extends('layouts.member')
 
 @section('content')
-    <div class="container mt-4">
+    <div class="container mt-4 mb-5" style="padding-bottom: 80px;">
+        
+        @if(session('success'))
+            <div class="alert alert-success" role="alert"> 
+                {{ session('success') }}
+            </div>
+        @endif
 
-    @session('success')
-        <div class="alert alert-success" role="alert"> 
-            {{ $value }}
-        </div>
-    @endsession
-
-    <div class="card text-center">
-            <div class="card-header">
-                Ringkasan belanja
+        <div class="card text-center shadow-lg mb-4" style="border-radius: 15px; background: linear-gradient(135deg, #3a3a5c, #4d4d73); border: none;">
+            <div class="card-header fw-bold" style="border-radius: 15px 15px 0 0; background: #515170; color: #FFD700; text-shadow: 1px 1px 2px #000;">
+                Ringkasan Belanja
             </div>
 
             <div class="card-body">
-                <h5 class="card-title fw-bold">{{ $payment->store->name }}</h5>
-                <div class="d-flex justify-content-between">
-                    <h5 class="card-title text-muted">Nomer Transaksi</h5>
-                    <h5 class="card-title">{{ $payment->transaction_number }}</h5> 
+                <h5 class="card-title fw-bold" style="color: #FFD700; text-shadow: 1px 1px 3px #000;">{{ $payment->store->name }}</h5>
+                <div class="d-flex justify-content-between border-bottom py-2" style="color: #f8f9fa;">
+                    <h6 class="text-muted" style="color: #ccc; text-shadow: 1px 1px 1px #000;">Nomor Transaksi</h6>
+                    <h6 class="fw-bold" style="text-shadow: 1px 1px 2px #000;">{{ $payment->transaction_number }}</h6>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <h5 class="card-title text-muted">Total Belanja</h5>
-                    <h5 class="card-title">{{ number_format($payment->amount, 0, ',', '.') }}</h5> 
+                <div class="d-flex justify-content-between border-bottom py-2" style="color: #f8f9fa;">
+                    <h6 class="text-muted" style="color: #ccc; text-shadow: 1px 1px 1px #000;">Total Belanja</h6>
+                    <h6 class="fw-bold" style="text-shadow: 1px 1px 2px #000;">{{ number_format($payment->amount, 0, ',', '.') }}</h6>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <h5 class="card-title text-muted">Catatan</h5>
-                    <h5 class="card-title">{{ $payment->note }}</h5> 
+                <div class="d-flex justify-content-between border-bottom py-2" style="color: #f8f9fa;">
+                    <h6 class="text-muted" style="color: #ccc; text-shadow: 1px 1px 1px #000;">Catatan</h6>
+                    <h6 class="fw-bold" style="text-shadow: 1px 1px 2px #000;">{{ $payment->note }}</h6>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <h5 class="card-title text-muted">Voucher Digunakan</h5>
-                    <h5 class="card-title">{{ number_format(Auth::user()->balance, 0, ',', '.') }}</h5> 
+                <div class="d-flex justify-content-between border-bottom py-2" style="color: #f8f9fa;">
+                    <h6 class="text-muted" style="color: #ccc; text-shadow: 1px 1px 1px #000;">Voucher Digunakan</h6>
+                    <h6 class="fw-bold" style="text-shadow: 1px 1px 2px #000;">{{ number_format($payment->voucher, 0, ',', '.') }}</h6>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <h5 class="card-title text-muted">Sisa Yang Harus Dibayar</h5>
-                    <h5 class="card-title">{{ number_format($payment->amount - $payment->voucher, 0, ',', '.') }}</h5> 
+                <div class="d-flex justify-content-between py-2" style="color: #f8f9fa;">
+                    <h6 class="text-muted" style="color: #ccc; text-shadow: 1px 1px 1px #000;">Sisa Yang Harus Dibayar</h6>
+                    <h6 class="fw-bold" style="text-shadow: 1px 1px 2px #000;">{{ number_format($payment->amount - $payment->voucher, 0, ',', '.') }}</h6>
                 </div>
             </div>
-            <div class="card-footer text-muted">
+            <div class="card-footer text-muted" style="background: #515170; color: #FFD700;">
                 {{ \Carbon\Carbon::parse($payment->created_at)->diffForHumans() }}
             </div>
-
         </div>
 
     </div>
