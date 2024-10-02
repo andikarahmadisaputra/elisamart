@@ -24,7 +24,7 @@ class PaymentRequestController extends Controller
 
     public function index(Request $request): View
     {
-        $paymentRequests = PaymentRequest::select('id', 'store_id', 'user_id', 'amount', 'status', 'created_at')->orderBy('created_at', 'desc')->paginate('10');
+        $paymentRequests = PaymentRequest::select('id', 'store_id', 'user_id', 'amount', 'status', 'created_at', 'created_by')->orderBy('created_at', 'desc')->paginate('10');
 
         return view('payment_request.index', compact('paymentRequests'))
                 ->with('i', (request()->input('page', 1) - 1) * 10);
@@ -55,6 +55,7 @@ class PaymentRequestController extends Controller
                 'store_id' => $request->input('store_id'),
                 'user_id' => $request->input('user_id'),
                 'amount' => $request->input('amount'),
+                'note' => $request->input('note'),
                 'status' => 'awaiting payment',
             ]);
 

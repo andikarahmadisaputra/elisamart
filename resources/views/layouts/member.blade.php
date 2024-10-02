@@ -63,30 +63,9 @@
   <nav class="navbar navbar-light bg-light navbar-custom">
     <div class="container-fluid">
       <span class="navbar-brand mb-0 h1">{{ config('app.name', 'Elisamart') }}</span>
-      <a href="#" class="bi bi-bell" style="font-size: 24px;"></a>
+      <a href="{{ route('member.index') }}" class="bi bi-bell" style="font-size: 24px;"></a>
     </div>
   </nav>
-
-  <!-- Jumbotron saldo -->
-  <div class="container mt-4">
-    <div class="jumbotron bg-light jumbotron-custom">
-      <h4><i class="bi bi-wallet2"></i> Saldo: <span id="saldo">Rp 1.000.000</span> <i class="bi bi-eye-slash" id="toggle-saldo"></i></h4>
-      <div class="d-flex justify-content-around mt-4">
-        <button class="btn btn-light btn-icon">
-          <i class="bi bi-arrow-left-right"></i>
-          <span>Transfer</span>
-        </button>
-        <button class="btn btn-light btn-icon">
-          <i class="bi bi-credit-card"></i>
-          <span>Bayar</span>
-        </button>
-        <button class="btn btn-light btn-icon">
-          <i class="bi bi-clock-history"></i>
-          <span>History</span>
-        </button>
-      </div>
-    </div>
-  </div>
 
   <main class="py-4">
       @yield('content')
@@ -95,28 +74,11 @@
   <!-- Navbar bawah -->
   <nav class="navbar bottom-nav navbar-light bg-light">
     <div class="container d-flex justify-content-around">
-      <a class="nav-link" href="#"><i class="bi bi-house"></i><br>Home</a>
+      <a class="nav-link" href="{{ route('member.index') }}"><i class="bi bi-house"></i><br>Home</a>
       <a class="nav-link" href="#"><i class="bi bi-tag"></i><br>Promo</a>
-      <a class="nav-link" href="#"><i class="bi bi-person"></i><br>Profile</a>
+      <a class="nav-link" href="{{ route('member.profile') }}"><i class="bi bi-person"></i><br>Profile</a>
     </div>
   </nav>
 
-  <!-- Script untuk fitur hide/unhide saldo -->
-  <script>
-    document.getElementById('toggle-saldo').addEventListener('click', function() {
-      var saldo = document.getElementById('saldo');
-      var icon = this;
-
-      if (saldo.style.display === 'none') {
-        saldo.style.display = 'inline';
-        icon.classList.remove('bi-eye');
-        icon.classList.add('bi-eye-slash');
-      } else {
-        saldo.style.display = 'none';
-        icon.classList.remove('bi-eye-slash');
-        icon.classList.add('bi-eye');
-      }
-    });
-  </script>
 </body>
 </html>

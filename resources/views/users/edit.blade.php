@@ -72,6 +72,12 @@
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
+                <strong>{{ __('master.user.form.phone') }}:</strong>
+                <input type="text" name="phone" placeholder="phone" class="form-control" value="{{ $user->phone }}">
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
                 <strong>{{ __('master.user.form.gender') }}:</strong>
                 <div>
                     <div class="form-check form-check-inline">

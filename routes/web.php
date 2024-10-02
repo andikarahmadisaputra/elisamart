@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Auth;
 //     return view('welcome');
 // });
 
-Route::get('/', [MemberController::class, 'index'])->name('member.index');
 
 Auth::routes();
 Auth::routes(['register' => false]);
@@ -25,10 +24,20 @@ Auth::routes(['register' => false]);
 Route::get('/admin', [HomeController::class, 'index'])->name('admin');
 
 Route::group(['middleware' => ['auth']], function() {
-    Route::resource('roles', RoleController::class);
-    Route::resource('users', UserController::class);
-    Route::resource('tags', TagController::class);
-    Route::resource('stores', StoreController::class);
+    Route::get('/', [MemberController::class, 'index'])->name('member.index');
+    Route::get('profile', [MemberController::class, 'profile'])->name('member.profile');
+    Route::get('pin', [MemberController::class, 'pin'])->name('member.pin');
+    Route::put('pin/store', [MemberController::class, 'updatePin'])->name('member.update_pin');
+    Route::get('payment', [MemberController::class, 'payment'])->name('member.payment');
+    Route::get('payment/{id}/voucher', [MemberController::class, 'payWithVoucher'])->name('member.pay_with_voucher');
+    Route::put('payment/{id}/pay', [MemberController::class, 'pay'])->name('member.pay');
+    Route::get('payment/{id}/detail', [MemberController::class, 'detail'])->name('member.payment_detail');
+
+
+    Route::resource('admin/roles', RoleController::class);
+    Route::resource('admin/users', UserController::class);
+    Route::resource('admin/tags', TagController::class);
+    Route::resource('admin/stores', StoreController::class);
 
     Route::get('admin/topup_store', [TopupStoreController::class, 'index'])->name('topup_store.index');
     Route::get('admin/topup_store/create', [TopupStoreController::class, 'create'])->name('topup_store.create');

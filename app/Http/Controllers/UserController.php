@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Models\Tag;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Arr;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -76,9 +75,9 @@ class UserController extends Controller
         ]);
     
         $input = $request->all();
-        $input['password'] = Hash::make($input['password']);
+        $input['password'] = bcrypt($input['password']);
         if (!empty($input['pin'])) {
-            $input['pin'] = Hash::make($input['pin']);
+            $input['pin'] = bcrypt($input['pin']);
         }
     
         $user = User::create($input);
@@ -144,13 +143,13 @@ class UserController extends Controller
     
         $input = $request->all();
         if(!empty($input['password'])){ 
-            $input['password'] = Hash::make($input['password']);
+            $input['password'] = bcrypt($input['password']);
         }else{
             $input = Arr::except($input,array('password'));    
         }
 
         if(!empty($input['pin'])){ 
-            $input['pin'] = Hash::make($input['pin']);
+            $input['pin'] = bcrypt($input['pin']);
         }else{
             $input = Arr::except($input,array('pin'));    
         }

@@ -46,8 +46,10 @@ class User extends Authenticatable
         'email',
         'password',
         'nik',
+        'phone',
         'gender',
         'pin',
+        'balance',
     ];
 
     /**
