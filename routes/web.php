@@ -28,10 +28,16 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('profile', [MemberController::class, 'profile'])->name('member.profile');
     Route::get('pin', [MemberController::class, 'pin'])->name('member.pin');
     Route::put('pin/store', [MemberController::class, 'updatePin'])->name('member.update_pin');
+    Route::get('transfer', [MemberController::class, 'transfer'])->name('member.transfer');
+    Route::put('transfer/store_transfer', [MemberController::class, 'storeTransfer'])->name('member.store_transfer');
+    Route::get('transfer/{id}/transfer_preview', [MemberController::class, 'transferPreview'])->name('member.transfer_preview');
+    Route::put('transfer/{id}/confirm_transfer', [MemberController::class, 'confirmTransfer'])->name('member.confirm_transfer');
+    Route::get('transfer/{id}/detail', [MemberController::class, 'transferDetail'])->name('member.transfer_detail');
     Route::get('payment', [MemberController::class, 'payment'])->name('member.payment');
-    Route::get('payment/{id}/voucher', [MemberController::class, 'payWithVoucher'])->name('member.pay_with_voucher');
-    Route::put('payment/{id}/pay', [MemberController::class, 'pay'])->name('member.pay');
-    Route::get('payment/{id}/detail', [MemberController::class, 'detail'])->name('member.payment_detail');
+    Route::get('payment/{id}/pay_with_voucher', [MemberController::class, 'payWithVoucher'])->name('member.pay_with_voucher');
+    Route::put('payment/{id}/confirm_pay_with_voucher', [MemberController::class, 'confirmPayWithVoucher'])->name('member.confirm_pay_with_voucher');
+    Route::get('payment/{id}/detail', [MemberController::class, 'paymentDetail'])->name('member.payment_detail');
+    Route::get('history', [MemberController::class, 'history'])->name('member.history');
 
 
     Route::resource('admin/roles', RoleController::class);

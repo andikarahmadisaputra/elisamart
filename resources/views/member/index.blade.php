@@ -6,7 +6,7 @@
     <div class="jumbotron jumbotron-custom text-center" style="border-radius: 15px; background: linear-gradient(135deg, #4e7bff, #d9d9d9); color: #ffffff; padding: 20px;">
       <h4 class="fw-bold"><i class="bi bi-wallet2"></i> Saldo: Rp <span id="saldo" style="text-shadow: 1px 1px 2px #000;">{{ number_format(Auth::user()->balance, 0, ',', '.') }}</span> <i class="bi bi-eye-slash" id="toggle-saldo" style="cursor: pointer;"></i></h4>
       <div class="d-flex justify-content-around mt-4">
-        <a class="btn btn-light btn-icon shadow-sm" style="border-radius: 10px;" href="#">
+        <a class="btn btn-light btn-icon shadow-sm" style="border-radius: 10px;" href="{{ route('member.transfer') }}">
           <i class="bi bi-arrow-left-right"></i>
           <span>Transfer</span>
         </a>
@@ -14,7 +14,7 @@
           <i class="bi bi-credit-card"></i>
           <span>Bayar</span>
         </a>
-        <a class="btn btn-light btn-icon shadow-sm" style="border-radius: 10px;" href="#">
+        <a class="btn btn-light btn-icon shadow-sm" style="border-radius: 10px;" href="{{ route('member.history') }}">
           <i class="bi bi-clock-history"></i>
           <span>History</span>
         </a>
@@ -23,7 +23,7 @@
   </div>
 
   <div class="text-center mb-5" style="font-size: 18px;">
-    Halaman member
+    
   </div>
 
   <!-- Script untuk fitur hide/unhide saldo -->

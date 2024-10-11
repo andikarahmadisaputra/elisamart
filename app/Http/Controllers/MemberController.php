@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\PaymentRequest;
 use App\Models\Store;
 use App\Models\User;
+use App\Models\Transfer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -155,10 +156,10 @@ class MemberController extends Controller
             return redirect()->route('member.payment_detail', $id);
         }
 
-        return view('member.voucher', compact('payment'));
+        return view('member.pay_with_voucher', compact('payment'));
     }
 
-    public function pay(Request $request, $id)
+    public function confirmPayWithVoucher(Request $request, $id)
     {
         $payment = PaymentRequest::where('id', $id)->first();
 
@@ -188,6 +189,12 @@ class MemberController extends Controller
                 Log::info('Voucher more than user balance: ' . $request->input('voucher'));
                 DB::rollBack();
                 return redirect()->back()->with('error', 'Voucher yang digunakan tidak boleh lebih dari ' . $userBalance);
+            }
+
+            if ($voucherAmount > $payment->amount) {
+                Log::info('Voucher more than payment amount: ' . $payment->amount);
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Voucher yang digunakan tidak boleh lebih dari ' . $payment->amount);
             }
 
             // Now, check the PIN
@@ -231,77 +238,183 @@ class MemberController extends Controller
         }
     }
 
-
-    public function pay2(Request $request, $id)
+    public function paymentDetail($id): View
     {
         $payment = PaymentRequest::where('id', $id)->first();
 
-        if ($payment->status != 'awaiting payment') {
-            return redirect()->route('member.payment_detail', $id);
-        }
-        
+        return view('member.payment_detail', compact('payment'));
+    }
+
+    public function history(): View
+    {
+        // Mendapatkan ID user yang sedang login
+        $userId = Auth::id();
+
+        // Query untuk tabel `topup_user_details` (Transaksi Top-Up)
+        $topupQuery = DB::table('topup_user_details')
+            ->join('topup_user_headers', 'topup_user_details.topup_user_header_id', '=', 'topup_user_headers.id')
+            ->where('topup_user_details.user_id', $userId)
+            ->where('topup_user_headers.status', 'approved')
+            ->select(
+                'topup_user_headers.updated_at as date',
+                DB::raw("'topup' as transaction_name"),
+                'topup_user_details.amount as amount'
+            );
+
+        // Query untuk tabel `transfers` (Transaksi Transfer)
+        $transferQuery = DB::table('transfers')
+            ->where(function($query) use ($userId) {
+                $query->where('sender_id', $userId)->orWhere('recipient_id', $userId);
+            })
+            ->where('status', 'success')
+            ->select(
+                'updated_at as date',
+                DB::raw("'transfer' as transaction_name"),
+                DB::raw("CASE 
+                            WHEN sender_id = $userId THEN -amount 
+                            ELSE amount 
+                        END as amount")
+            );
+
+        // Query untuk tabel `payments` (Transaksi Payment)
+        $paymentQuery = DB::table('payment_requests')
+            ->where('user_id', $userId)
+            ->where('status', 'paid')
+            ->select(
+                'updated_at as date',
+                DB::raw("'payment' as transaction_name"),
+                DB::raw("-voucher as amount")
+            );
+
+        // Gabungkan ketiga query menggunakan `union`
+        $transactions = $topupQuery
+            ->unionAll($transferQuery)
+            ->unionAll($paymentQuery)
+            ->orderBy('date', 'desc')
+            ->get();
+
+        // Return hasilnya
+        return view('member.history', compact('transactions'));
+    }
+
+    public function transfer(): View
+    {
+        return view('member.transfer');
+    }
+
+    public function storeTransfer(Request $request): RedirectResponse
+    { 
+        // Validasi input
         $request->validate([
-            'voucher' => 'required|numeric|min:0',
-            'pin' => 'required|string|size:6|regex:/^[0-9]+$/',
+            'recipient' => 'required|string',
+            'amount' => 'required|numeric|min:1',
+            'note' => 'nullable|string|max:255',
         ]);
+
+        // Ambil input
+        $recipientInput = $request->input('recipient');
+        $amount = $request->input('amount');
+        $note = $request->input('note');
+
+        // Cari recipient berdasarkan email, NIK, atau nomor telepon
+        $recipient = User::where('email', $recipientInput)
+                        ->orWhere('nik', $recipientInput)
+                        ->orWhere('phone', $recipientInput)
+                        ->first();
+
+        // Cek apakah recipient ditemukan
+        if (!$recipient) {
+            return redirect()->back()->with('error', 'Penerima tidak ditemukan.');
+        }
 
         DB::beginTransaction();
 
         try {
-            if(Hash::check($request->input('pin'), Auth::user()->pin) && $request->input('voucher') >= 0 && $request->input('voucher') <= Auth::user()->balance) {
-                $paymentRequest = PaymentRequest::findOrFail($id);
-                $paymentRequest->status = 'paid';
-                $paymentRequest->voucher = $request->input('voucher');
-                $paymentRequest->save();
+            $transfer = Transfer::create([
+                'sender_id' => Auth::id(),
+                'recipient_id' => $recipient->id,
+                'amount' => $amount,
+                'note' => $note,
+                'status' => 'pending',
+            ]);
 
-                $user = User::findOrFail(Auth::user()->id);
-                $user->balance -= $request->input('voucher');
-                $user->save();
+            DB::commit();
 
-                $store = Store::findOrFail(PaymentRequest::find($id)->store_id);
-                $store->balance_in += $request->input('voucher');
-                $store->save();
-
-                DB::commit();
-
-                return redirect()->route('member.payment_detail', $id)->with('success', 'Pembayaran Berhasil');
-            } elseif (Hash::check($request->input('pin'), Auth::user()->pin)) {
-                DB::rollBack();
-
-                return redirect()->back()->with('error', 'PIN yang Anda masukkan salah');
-            } elseif ($request->input('voucher') < 0) {
-                DB::rollBack();
-
-                return redirect()->back()->with('error', 'Voucher yang digunakan tidak boleh kurang dari 0');
-            } elseif ($request->input('voucher') > Auth::user()->balance) {
-                DB::rollBack();
-
-                return redirect()->back()->with('error', 'Voucher yang digunakan tidak boleh lebih dari '. Auth::user()->balance);
-            }
-
-            
+            return redirect()->route('member.transfer_preview', $transfer->id);
         } catch (\Exception $e) {
             DB::rollBack();
 
-            Log::error('Update PIN creation failed.', [
+            Log::error('Transfer creation failed.', [
                 'error_message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'stack_trace' => $e->getTraceAsString(),
                 'request_data' => $request->all(),
                 'user_id' => Auth::id(),
-                'payment_request_id' => PaymentRequest::find($id),
             ]);
 
-            return redirect()->back()->with('error', 'Pembayaran gagal, silahkan hubungi Admin');
+            return redirect()->back()->with('error', 'Transaksi gagal, silahkan hubungi admin');
         }
-        
     }
 
-    public function detail($id)
+    public function transferPreview($id): View
     {
-        $payment = PaymentRequest::where('id', $id)->first();
+        $transfer = Transfer::where('id', $id)->first();
 
-        return view('member.detail', compact('payment'));
+        return view('member.transfer_preview', compact('transfer'));
+    }
+
+    public function confirmTransfer(Request $request, $id)
+    {
+        $request->validate([
+            'pin' => 'required|string|size:6|regex:/^[0-9]+$/',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            if (Hash::check($request->input('pin'), Auth::user()->pin)) {
+                // All checks passed, proceed with payment
+                $transfer = Transfer::findOrFail($id);
+                $transfer->status = 'success';
+                $transfer->save();
+
+                $sender = User::findOrFail($transfer->sender_id);
+                $sender->balance -= $transfer->amount;
+                $sender->save();
+
+                $recipient = User::findOrFail($transfer->recipient_id);
+                $recipient->balance += $transfer->amount;
+                $recipient->save();
+
+                DB::commit();
+
+                return redirect()->route('member.transfer_detail', $id)->with('success', 'Transfer Berhasil');
+            } else {
+                DB::rollBack();
+                
+                return redirect()->back()->with('error', 'PIN yang Anda masukkan salah');
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Confirm transfer failed.', [
+                'error_message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'stack_trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()->with('error', 'Transfer gagal, silahkan hubungi admin');
+        }
+    }
+
+    public function transferDetail($id)
+    {
+        $transfer = Transfer::where('id', $id)->first();
+
+        return view('member.transfer_detail', compact('transfer'));
     }
 }

@@ -38,20 +38,20 @@
             </div>
         </div>
 
-        <form class="mt-3" method="POST" action="{{ route('member.pay', $payment->id) }}">
+        <form class="mt-3" method="POST" action="{{ route('member.confirm_pay_with_voucher', $payment->id) }}">
             @csrf
             @method('PUT')
 
             <div class="row mb-3">
                 <label for="voucher" class="col-md-4 col-form-label fw-bold">Voucher akan digunakan (max: {{ number_format(Auth::user()->balance, 0, ',', '.') }})</label>
                 <div class="col-md-8">
-                    <input type="text" name="voucher" class="form-control" id="voucher" placeholder="Masukkan jumlah yang akan dipakai">
+                    <input type="text" name="voucher" class="form-control" id="voucher" placeholder="Masukkan jumlah yang akan dipakai" value="{{ old('voucher') }}" required>
                 </div>
             </div>
             <div class="row mb-3">
                 <label for="pin" class="col-md-4 col-form-label fw-bold">PIN</label>
                 <div class="col-md-8">
-                    <input type="password" name="pin" class="form-control" id="pin" placeholder="Masukkan PIN">
+                    <input type="password" name="pin" class="form-control" id="pin" placeholder="Masukkan PIN" required>
                 </div>
             </div>
             <div class="d-flex justify-content-end">
