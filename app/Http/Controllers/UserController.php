@@ -35,10 +35,10 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $data = User::latest()->paginate(5);
+        $data = User::with('tags')->select('id', 'name', 'email', 'nia', 'nik', 'phone', 'gender', 'balance')->latest()->paginate(20);
   
         return view('users.index',compact('data'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
+            ->with('i', ($request->input('page', 1) - 1) * 20);
     }
     
     /**
@@ -49,7 +49,7 @@ class UserController extends Controller
     public function create(): View
     {
         $roles = Role::pluck('name','name')->all();
-        $tags = Tag::all();
+        $tags = Tag::select('id', 'name')->get();
 
         return view('users.create',compact('roles', 'tags'));
     }
@@ -62,32 +62,50 @@ class UserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $this->validate($request, [
+        $validatedData = $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|same:confirm-password',
-            'roles' => 'required',
-            'nik' => 'nullable|unique:users,nik',
+            'roles' => 'nullable|exists:roles,name',
+            'nia' => 'nullable|size:10|unique:users,nia',
+            'nik' => 'nullable|size:16|regex:/^[0-9]+$/|unique:users,nik',
             'phone' => 'nullable|string|regex:/^\d{10,13}$/',
             'gender' => 'nullable|in:pria,wanita',
             'pin' => 'nullable|string|size:6|regex:/^[0-9]+$/',
-            'tags' => 'array',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
         ]);
+
+        DB::beginTransaction();
+
+        try {
+            // Encrypt sensitive fields
+            $validatedData['password'] = bcrypt($validatedData['password']);
+            if (!empty($validatedData['pin'])) {
+                $validatedData['pin'] = bcrypt($validatedData['pin']);
+            }
+        
+            // Create user and assign role
+            $user = User::create($validatedData);
+            if (!empty($validatedData['roles'])) {
+                $user->assignRole($validatedData['roles']);
+            }
+
+            // Sync tags if provided
+            if (!empty($validatedData['tags'])) {
+                $user->tags()->sync($validatedData['tags']);
+            }
+
+            DB::commit();
     
-        $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
-        if (!empty($input['pin'])) {
-            $input['pin'] = bcrypt($input['pin']);
+            return redirect()->route('users.index')
+                ->with('success','User created successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput($request->all()) // Return input values
+                ->withErrors(['error' => 'Failed to create user: ' . $e->getMessage()]);
         }
-    
-        $user = User::create($input);
-        $user->assignRole($request->input('roles'));
-        if ($request->has('tags')) {
-            $user->tags()->sync($request->tags);
-        }
-    
-        return redirect()->route('users.index')
-                        ->with('success','User created successfully');
     }
     
     /**

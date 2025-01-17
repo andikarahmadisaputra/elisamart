@@ -12,13 +12,14 @@
     </div>
 </div>
 
-@if (count($errors) > 0)
+{{-- Display Error Messages --}}
+@if ($errors->any())
     <div class="alert alert-danger">
-      <strong>Whoops!</strong> There were some problems with your input.<br><br>
+      <strong>{{ __('Whoops! Something went wrong.') }}</strong>
       <ul>
-         @foreach ($errors->all() as $error)
+        @foreach ($errors->all() as $error)
            <li>{{ $error }}</li>
-         @endforeach
+        @endforeach
       </ul>
     </div>
 @endif
@@ -26,87 +27,169 @@
 <form method="POST" action="{{ route('users.store') }}">
     @csrf
     <div class="row">
+        {{-- Name Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>{{ __('master.user.form.name') }}:</strong>
-                <input type="text" name="name" placeholder="Name" class="form-control" value="{{ old('name') }}">
+                <label for="name"><strong>{{ __('master.user.form.name') }}:</strong></label>
+                <input type="text" id="name" name="name" placeholder="Name"
+                       class="form-control @error('name') is-invalid @enderror"
+                       value="{{ old('name') }}">
+                @error('name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
         </div>
+
+        {{-- Email Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>{{ __('master.user.form.email') }}:</strong>
-                <input type="email" name="email" placeholder="Email" class="form-control" value="{{ old('email') }}">
+                <label for="email"><strong>{{ __('master.user.form.email') }}:</strong></label>
+                <input type="email" id="email" name="email" placeholder="Email"
+                       class="form-control @error('email') is-invalid @enderror"
+                       value="{{ old('email') }}">
+                @error('email')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
         </div>
+
+        {{-- Password Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>{{ __('master.user.form.password') }}:</strong>
-                <input type="password" name="password" placeholder="Password" class="form-control" value="{{ old('password') }}">
+                <label for="password"><strong>{{ __('master.user.form.password') }}:</strong></label>
+                <input type="password" id="password" name="password" placeholder="Password"
+                       class="form-control @error('password') is-invalid @enderror">
+                @error('password')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
         </div>
+
+        {{-- Confirm Password Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>{{ __('master.user.form.confirm_password') }}:</strong>
-                <input type="password" name="confirm-password" placeholder="Confirm Password" class="form-control">
+                <label for="confirm-password"><strong>{{ __('master.user.form.confirm_password') }}:</strong></label>
+                <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm Password"
+                       class="form-control">
             </div>
         </div>
+
+        {{-- Role Selection --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>{{ __('master.user.form.role') }}:</strong>
-                <select name="roles[]" class="form-control" multiple="multiple">
+                <label for="roles"><strong>{{ __('master.user.form.role') }}:</strong></label>
+                <select name="roles[]" id="roles" class="form-control @error('roles') is-invalid @enderror" multiple>
                     @foreach ($roles as $value => $label)
-                        <option value="{{ $value }}">
+                        <option value="{{ $value }}" {{ collect(old('roles'))->contains($value) ? 'selected' : '' }}>
                             {{ $label }}
                         </option>
-                     @endforeach
+                    @endforeach
                 </select>
+                @error('roles')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
         </div>
+
+        {{-- NIA Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>{{ __('master.user.form.nik') }}:</strong>
-                <input type="text" name="nik" placeholder="NIK" class="form-control" value="{{ old('nik') }}">
+                <label for="nia"><strong>{{ __('master.user.form.nia') }}:</strong></label>
+                <input type="text" id="nia" name="nia" placeholder="NIA"
+                       class="form-control @error('nia') is-invalid @enderror"
+                       value="{{ old('nia') }}">
+                @error('nia')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
         </div>
+
+        {{-- NIK Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>{{ __('master.user.form.gender') }}:</strong>
+                <label for="nik"><strong>{{ __('master.user.form.nik') }}:</strong></label>
+                <input type="text" id="nik" name="nik" placeholder="NIK"
+                       class="form-control @error('nik') is-invalid @enderror"
+                       value="{{ old('nik') }}">
+                @error('nik')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
+
+        {{-- Gender Input --}}
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <label><strong>{{ __('master.user.form.gender') }}:</strong></label>
                 <div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" id="male" value="pria" required>
-                        <label class="form-check-label" for="male">Pria</label>
+                        <input class="form-check-input" type="radio" name="gender" id="male" value="pria"
+                               {{ old('gender') == 'pria' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="male">{{ __('Pria') }}</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" id="female" value="wanita" required>
-                        <label class="form-check-label" for="female">Wanita</label>
+                        <input class="form-check-input" type="radio" name="gender" id="female" value="wanita"
+                               {{ old('gender') == 'wanita' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="female">{{ __('Wanita') }}</label>
                     </div>
                 </div>
+                @error('gender')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
             </div>
         </div>
+
+        {{-- Phone Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>{{ __('master.user.form.pin') }}:</strong>
-                <input type="text" name="pin" placeholder="PIN" class="form-control" value="{{ old('pin') }}">
+                <label for="phone"><strong>{{ __('master.user.form.phone') }}:</strong></label>
+                <input type="text" id="phone" name="phone" placeholder="Phone"
+                       class="form-control @error('phone') is-invalid @enderror"
+                       value="{{ old('phone') }}">
+                @error('phone')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
         </div>
+
+        {{-- PIN Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <strong>{{ __('master.user.form.tag') }}:</strong>
+                <label for="pin"><strong>{{ __('master.user.form.pin') }}:</strong></label>
+                <input type="text" id="pin" name="pin" placeholder="PIN"
+                       class="form-control @error('pin') is-invalid @enderror"
+                       value="{{ old('pin') }}">
+                @error('pin')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
+
+        {{-- Tags Input --}}
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <label><strong>{{ __('master.user.form.tag') }}:</strong></label>
                 <div>
                     @foreach($tags as $tag)
-                        <input
-                            class="form-check_input"
-                            type="checkbox"
-                            name="tags[]"
-                            id="tag_{{ $tag->id }}"
-                            value="{{ $tag->id }}">
-                        <label class="form-check-label" for="tag_{{ $tag->id }}">{{ $tag->name }}</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="tags[]"
+                                   id="tag_{{ $tag->id }}" value="{{ $tag->id }}"
+                                   {{ collect(old('tags'))->contains($tag->id) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="tag_{{ $tag->id }}">{{ $tag->name }}</label>
+                        </div>
                     @endforeach
                 </div>
+                @error('tags')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
             </div>
         </div>
+
+        {{-- Submit Button --}}
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
-            <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3"><i class="fa-solid fa-floppy-disk"></i> {{ __('master.user.button.submit') }}</button>
+            <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3">
+                <i class="fa-solid fa-floppy-disk"></i> {{ __('master.user.button.submit') }}
+            </button>
         </div>
     </div>
 </form>

@@ -8,10 +8,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, SoftDeletes;
 
     protected static function boot()
     {
@@ -45,6 +46,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'nia',
         'nik',
         'phone',
         'gender',
@@ -77,6 +79,6 @@ class User extends Authenticatable
 
     public function tags()
     {
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Tag::class, 'tag_user', 'user_id', 'tag_id');
     }
 }
