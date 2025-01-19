@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PaymentRequestController;
@@ -11,17 +11,11 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TopupStoreController;
 use App\Http\Controllers\TopupUserController;
-use Illuminate\Support\Facades\Auth;
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 
 
-Auth::routes();
-Auth::routes(['register' => false]);
-
-Route::get('/admin', [HomeController::class, 'index'])->name('admin');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::group(['middleware' => ['auth']], function() {
     Route::get('/', [MemberController::class, 'index'])->name('member.index');
@@ -45,6 +39,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('admin/tags', TagController::class);
     Route::resource('admin/stores', StoreController::class);
 
+    Route::get('/admin', [HomeController::class, 'index'])->name('admin');
     Route::get('admin/topup_store', [TopupStoreController::class, 'index'])->name('topup_store.index');
     Route::get('admin/topup_store/create', [TopupStoreController::class, 'create'])->name('topup_store.create');
     Route::post('admin/topup_store/store', [TopupStoreController::class, 'store'])->name('topup_store.store');
