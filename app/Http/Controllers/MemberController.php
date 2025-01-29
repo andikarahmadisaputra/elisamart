@@ -23,7 +23,7 @@ class MemberController extends Controller
 
     public function payment(): View
     {
-        $payments = PaymentRequest::select('id', 'transaction_number', 'amount', 'note', 'status', 'store_id', 'user_id', 'created_at')->where('user_id', Auth::user()->id)->where('status', 'awaiting payment')->get();
+        $payments = PaymentRequest::select('id', 'transaction_number', 'amount', 'bon_number', 'note', 'status', 'store_id', 'user_id', 'created_at')->where('user_id', Auth::user()->id)->where('status', 'awaiting payment')->get();
 
         return view('member.payment', compact('payments'));
     }
@@ -40,7 +40,7 @@ class MemberController extends Controller
 
     public function updatePin(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'old_pin' => 'nullable|string|size:6|regex:/^[0-9]+$/',
             'pin' => 'required|string|size:6|regex:/^[0-9]+$/|same:confirm_pin',
             'confirm_pin' => 'required|string|size:6|regex:/^[0-9]+$/',
@@ -53,15 +53,15 @@ class MemberController extends Controller
 
             if (empty($user->pin)) {
                 // If there's no existing PIN, hash and save the new PIN
-                $user->pin = bcrypt($request->input('pin'));
+                $user->pin = bcrypt($validatedData['pin']);
                 $user->save();
                 DB::commit();
 
                 return redirect()->route('member.profile')->with('success', 'PIN created successfully');
             } else {
                 // Verify old PIN
-                if (Hash::check($request->input('old_pin'), $user->pin)) {
-                    $user->pin = bcrypt($request->input('pin'));
+                if (Hash::check($validatedData['old_pin'], $user->pin)) {
+                    $user->pin = bcrypt($validatedData['pin']);
                     $user->save();
                     DB::commit();
 
@@ -84,67 +84,6 @@ class MemberController extends Controller
             ]);
 
             return redirect()->back()->with('error', 'Error updating PIN. Please try again.');
-        }
-    }
-
-    public function updatePin2(Request $request): RedirectResponse
-    {
-        if (!empty(Auth::user()->pin)) {
-            $this->validate($request, [
-                'old_pin' => 'required|string|size:6|regex:/^[0-9]+$/',
-                'pin' => 'required|string|size:6|regex:/^[0-9]+$/|same:confirm_pin',
-            ]);
-        } else {
-            $this->validate($request, [
-                'pin' => 'required|string|size:6|regex:/^[0-9]+$/|same:confirm_pin',
-            ]);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            if(empty(Auth::user()->pin)) {
-                $user = User::findOrFail(Auth::user()->id);
-                $user->pin = bcrypt($request->input('pin'));
-                $user->save();
-    
-                DB::commit();
-
-                return redirect()->route('member.profile')
-                            ->with('success','PIN created successfully');
-            } else {
-                if (Hash::check($request->input('old_pin'), Auth::user()->pin)) {
-                    $user = User::findOrFail(Auth::user()->id);
-                    $user->pin = bcrypt($request->input('pin'));
-                    $user->save();
-
-                    DB::commit();
-
-                    return redirect()->route('member.profile')
-                            ->with('success','PIN updated successfully');
-
-                } else {
-                    DB::rollBack();
-
-                    return redirect()->back()->with('error', 'PIN lama tidak sama');
-                }
-            }
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Update PIN creation failed.', [
-                'error_message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'stack_trace' => $e->getTraceAsString(),
-                'request_data' => $request->all(),
-                'user_id' => Auth::id(),
-                'pin' => $request->input('pin'),
-                'confirm-pin' => $request->input('confirm-pin'),
-                'old_pin' => $request->input('old_pin'),
-            ]);
-
-            return redirect()->back()->with('error', 'Error update PIN'.$e->getMessage());
         }
     }
 

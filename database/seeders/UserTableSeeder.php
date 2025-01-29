@@ -17,6 +17,7 @@ class UserTableSeeder extends Seeder
             [
                 'name' => 'Perawat Satu', 
                 'email' => 'perawat1@gmail.com',
+                'username' => 'perawat1',
                 'password' => bcrypt('123456'),
                 'gender' => 'pria',
                 'pin' => '123456',
@@ -24,6 +25,7 @@ class UserTableSeeder extends Seeder
             [
                 'name' => 'Perawat Dua', 
                 'email' => 'perawat2@gmail.com',
+                'username' => 'perawat2',
                 'password' => bcrypt('123456'),
                 'gender' => 'pria',
                 'pin' => '123456',
@@ -31,6 +33,7 @@ class UserTableSeeder extends Seeder
             [
                 'name' => 'Perawat Tiga', 
                 'email' => 'perawat3@gmail.com',
+                'username' => 'perawat3',
                 'password' => bcrypt('123456'),
                 'gender' => 'pria',
                 'pin' => '123456',

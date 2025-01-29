@@ -118,8 +118,9 @@ return [
         'table' => [
             'no' => 'No',
             'transaction_number' => 'Nomer Transaksi',
+            'bon_number' => 'Nomor BON',
             'store' => 'Toko',
-            'user' => 'Pengguna',
+            'user' => 'Konsumen',
             'amount' => 'Total',
             'note' => 'Keterangan',
             'status' => 'Status',
@@ -128,12 +129,13 @@ return [
         ],
         'form' => [
             'store' => 'Toko',
-            'user' => 'Pengguna',
+            'user' => 'Konsumen',
             'amount' => 'Jumlah',
             'note' => 'Keterangan',
         ],
         'button' => [
             'add' => 'Buat Baru',
+            'edit' => 'Ubah',
             'cancel' => 'Batal',
             'submit' => 'Simpan',
         ],

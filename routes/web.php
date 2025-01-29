@@ -11,6 +11,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TopupStoreController;
 use App\Http\Controllers\TopupUserController;
+use App\Models\User;
 
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
@@ -64,4 +65,19 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('admin/payment_request', [PaymentRequestController::class, 'index'])->name('payment_request.index');
     Route::get('admin/payment_request/create', [PaymentRequestController::class, 'create'])->name('payment_request.create');
     Route::post('admin/payment_request/store', [PaymentRequestController::class, 'store'])->name('payment_request.store');
+    Route::get('admin/payment_request/{paymentRequest}/edit', [PaymentRequestController::class, 'edit'])->name('payment_request.edit');
+    Route::patch('admin/payment_request/{paymentRequest}/update', [PaymentRequestController::class, 'update'])->name('payment_request.update');
+    Route::patch('admin/payment_request/{paymentRequest}/cancel', [PaymentRequestController::class, 'cancel'])->name('payment_request.cancel');
+    Route::get('admin/payment_request/{id}/review', [PaymentRequestController::class, 'reviewPayment']);
+    Route::post('admin/payment_request/confirm', [PaymentRequestController::class, 'confirmPayment']);
 });
+
+Route::get('/api/users', function (Illuminate\Http\Request $request) {
+    $query = $request->get('query', '');
+    $users = User::where('name', 'like', "%{$query}%")
+        ->orWhere('username', 'like', "%{$query}%")
+        ->orWhere('email', 'like', "%{$query}%")
+        ->limit(10)
+        ->get(['id', 'name', 'username', 'email', 'balance']);
+    return response()->json($users);
+})->middleware(['auth', 'can:user.list']);

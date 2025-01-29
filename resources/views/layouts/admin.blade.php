@@ -35,130 +35,115 @@
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('navbar.login') }}</a>
-                                </li>
-                            @endif
+                        @if(Gate::any(['user.list', 'store.list', 'role.list', 'tag.list']))
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.master') }}</a>
+                            <ul class="dropdown-menu">
+                                @if(Gate::any(['user.list', 'user.create', 'user.edit', 'user.delete']))
+                                <li><a class="dropdown-item" href="{{ route('users.index') }}">{{ __('navbar.master.user') }}</a></li>
+                                @endif
+                                @if(Gate::any(['store.list', 'store.create', 'store.edit', 'store.delete']))
+                                <li><a class="dropdown-item" href="{{ route('stores.index') }}">{{ __('navbar.master.store') }}</a></li>
+                                @endif
+                                @if(gate::any(['role.list', 'role.create', 'role.edit', 'role.delete']))
+                                <li><a class="dropdown-item" href="{{ route('roles.index') }}">{{ __('navbar.master.role') }}</a></li>
+                                @endif
+                                @if(Gate::any(['tag.list', 'tag.create', 'tag.edit', 'tag.delete']))
+                                <li><a class="dropdown-item" href="{{ route('tags.index') }}">{{ __('navbar.master.tag') }}</a></li>
+                                @endif
+                                @if(Gate::any(['promo.list', 'promo.create', 'promo.edit', 'promo.delete']))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.master.promo') }}</a></li>
+                                @endif
+                            </ul>
+                        </li>
+                        @endif
+                        @if(Gate::any(['topup_store.list', 'topup_store.approval', 'topup_user.list', 'payment_request.list']))
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.transaction') }}</a>
+                            <ul class="dropdown-menu">
+                                @if(Gate::any(['topup_store.list', 'topup_store.create', 'topup_store.edit', 'topup_store.cancel']))
+                                <li><a class="dropdown-item" href="{{ route('topup_store.index') }}">{{ __('navbar.transaction.topup_store') }}</a></li>
+                                @endif
+                                @if(Gate::any(['topup_store.approval']))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.transaction.approve_store') }}</a></li>
+                                @endif
+                                @if(Gate::any(['topup_user.list', 'topup_user.create', 'topup_user.edit', 'topup_user.cancel']))
+                                <li><a class="dropdown-item" href="{{ route('topup_user.index') }}">{{ __('navbar.transaction.topup_user') }}</a></li>
+                                @endif
+                                @if(Gate::any(['topup_user.approval']))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.transaction.approve_user' )}}</a></li>
+                                @endif
+                                @if(Gate::any(['payment_request.list', 'payment_request.create', 'payment_request.edit']))
+                                <li><a class="dropdown-item" href="{{ route('payment_request.index') }}">{{ __('navbar.transaction.payment_request' )}}</a></li>
+                                @endif
+                            </ul>
+                        </li>
+                        @endif
+                        @if(Gate::any(['report_user.list', 'report_topup_store.list', 'report_topup_user.list', 'report_received_payment.list', 'report_mutation.list']))
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.report') }}</a>
+                            <ul class="dropdown-menu">
+                                @if(Gate::any('report_user.list'))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.report.user_summary') }}</a></li>
+                                @endif
+                                @if(Gate::any('report_topup_store.list'))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.report.topup_store') }}</a></li>
+                                @endif
+                                @if(Gate::any('report_topup_user.list'))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.report.topup_user') }}</a></li>
+                                @endif
+                                @if(Gate::any('report_received_payment.list'))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.report.received_payment') }}</a></li>
+                                @endif
+                                @if(Gate::any('report_mutation.list'))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.report.mutation') }}</a></li>
+                                @endif
+                            </ul>
+                        </li>
+                        @endif
+                        @if(Gate::any(['process.dailyclose', 'process.monthlyclose', 'process.dailybackup', 'process.monthlybackup']))
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.process') }}</a>
+                            <ul class="dropdown-menu">
+                                @if(Gate::any('process.dailyclose'))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.process.daily_close') }}</a></li>
+                                @endif
+                                @if(Gate::any('process.monthlyclose'))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.process.monthly_close') }}</a></li>
+                                @endif
+                                @if(Gate::any('process.dailybackup'))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.process.daily_backup') }}</a></li>
+                                @endif
+                                @if(Gate::any('process.monthlybackup'))
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.process.monthly_backup') }}</a></li>
+                                @endif
+                            </ul>
+                        </li>
+                        @endif
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.utilities') }}</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.utilities.change_password') }}</a></li>
+                                <li><a class="dropdown-item" href="#">{{ __('navbar.utilities.change_pin') }}</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                {{ Auth::user()->name }}
+                            </a>
 
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('navbar.register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            @if(Gate::any(['user.list', 'store.list', 'role.list', 'tag.list']))
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.master') }}</a>
-                                <ul class="dropdown-menu">
-                                    @if(Gate::any(['user.list', 'user.create', 'user.edit', 'user.delete']))
-                                    <li><a class="dropdown-item" href="{{ route('users.index') }}">{{ __('navbar.master.user') }}</a></li>
-                                    @endif
-                                    @if(Gate::any(['store.list', 'store.create', 'store.edit', 'store.delete']))
-                                    <li><a class="dropdown-item" href="{{ route('stores.index') }}">{{ __('navbar.master.store') }}</a></li>
-                                    @endif
-                                    @if(gate::any(['role.list', 'role.create', 'role.edit', 'role.delete']))
-                                    <li><a class="dropdown-item" href="{{ route('roles.index') }}">{{ __('navbar.master.role') }}</a></li>
-                                    @endif
-                                    @if(Gate::any(['tag.list', 'tag.create', 'tag.edit', 'tag.delete']))
-                                    <li><a class="dropdown-item" href="{{ route('tags.index') }}">{{ __('navbar.master.tag') }}</a></li>
-                                    @endif
-                                    @if(Gate::any(['promo.list', 'promo.create', 'promo.edit', 'promo.delete']))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.master.promo') }}</a></li>
-                                    @endif
-                                </ul>
-                            </li>
-                            @endif
-                            @if(Gate::any(['topup_store.list', 'topup_store.approval', 'topup_user.list', 'payment_request.list']))
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.transaction') }}</a>
-                                <ul class="dropdown-menu">
-                                    @if(Gate::any(['topup_store.list', 'topup_store.create', 'topup_store.edit', 'topup_store.cancel']))
-                                    <li><a class="dropdown-item" href="{{ route('topup_store.index') }}">{{ __('navbar.transaction.topup_store') }}</a></li>
-                                    @endif
-                                    @if(Gate::any(['topup_store.approval']))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.transaction.approve_store') }}</a></li>
-                                    @endif
-                                    @if(Gate::any(['topup_user.list', 'topup_user.create', 'topup_user.edit', 'topup_user.cancel']))
-                                    <li><a class="dropdown-item" href="{{ route('topup_user.index') }}">{{ __('navbar.transaction.topup_user') }}</a></li>
-                                    @endif
-                                    @if(Gate::any(['topup_user.approval']))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.transaction.approve_user' )}}</a></li>
-                                    @endif
-                                    @if(Gate::any(['payment_request.list', 'payment_request.create', 'payment_request.edit']))
-                                    <li><a class="dropdown-item" href="{{ route('payment_request.index') }}">{{ __('navbar.transaction.payment_request' )}}</a></li>
-                                    @endif
-                                </ul>
-                            </li>
-                            @endif
-                            @if(Gate::any('report_user.list', 'report_topup_store.list', 'report_topup_user.list', 'report_received_payment.list', 'report_mutation.list'))
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.report') }}</a>
-                                <ul class="dropdown-menu">
-                                    @if(Gate::any('report_user.list'))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.report.user_summary') }}</a></li>
-                                    @endif
-                                    @if(Gate::any('report_topup_store.list'))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.report.topup_store') }}</a></li>
-                                    @endif
-                                    @if(Gate::any('report_topup_user.list'))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.report.topup_user') }}</a></li>
-                                    @endif
-                                    @if(Gate::any('report_received_payment.list'))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.report.received_payment') }}</a></li>
-                                    @endif
-                                    @if(Gate::any('report_mutation.list'))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.report.mutation') }}</a></li>
-                                    @endif
-                                </ul>
-                            </li>
-                            @endif
-                            @if(Gate::any('process.dailyclose', 'process.monthlyclose', 'process.dailybackup', 'process.monthlybackup'))
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.process') }}</a>
-                                <ul class="dropdown-menu">
-                                    @if(Gate::any('process.dailyclose'))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.process.daily_close') }}</a></li>
-                                    @endif
-                                    @if(Gate::any('process.monthlyclose'))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.process.monthly_close') }}</a></li>
-                                    @endif
-                                    @if(Gate::any('process.dailybackup'))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.process.daily_backup') }}</a></li>
-                                    @endif
-                                    @if(Gate::any('process.monthlybackup'))
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.process.monthly_backup') }}</a></li>
-                                    @endif
-                                </ul>
-                            </li>
-                            @endif
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ __('navbar.menu.utilities') }}</a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.utilities.change_password') }}</a></li>
-                                    <li><a class="dropdown-item" href="#">{{ __('navbar.utilities.change_pin') }}</a></li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault();
+                                    document.getElementById('logout-form').submit();">
+                                    {{ __('navbar.logout') }}
                                 </a>
 
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                        onclick="event.preventDefault();
-                                        document.getElementById('logout-form').submit();">
-                                        {{ __('navbar.logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
+                            </div>
+                        </li>
                     </ul>
                 </div>
             </div>

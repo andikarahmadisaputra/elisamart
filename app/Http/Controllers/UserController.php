@@ -35,7 +35,7 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $data = User::with('tags')->select('id', 'name', 'email', 'nia', 'nik', 'phone', 'gender', 'balance')->latest()->paginate(20);
+        $data = User::with('tags')->select('id', 'name', 'email', 'username', 'nik', 'phone', 'gender', 'balance')->orderBy('name')->paginate(20);
   
         return view('users.index',compact('data'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
@@ -63,17 +63,63 @@ class UserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validatedData = $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:50|regex:/^[a-zA-Z\s]+$/',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|same:confirm-password',
             'roles' => 'nullable|exists:roles,name',
-            'nia' => 'nullable|size:10|unique:users,nia',
+            'username' => 'nullable|min:3|max:30|unique:users,username|regex:/^\S*$/',
             'nik' => 'nullable|size:16|regex:/^[0-9]+$/|unique:users,nik',
             'phone' => 'nullable|string|regex:/^\d{10,13}$/',
             'gender' => 'nullable|in:pria,wanita',
             'pin' => 'nullable|string|size:6|regex:/^[0-9]+$/',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
+        ],[
+            // Pesan untuk kolom 'name'
+            'name.required' => 'Nama wajib diisi.',
+            'name.string' => 'Nama harus berupa teks.',
+            'name.max' => 'Nama tidak boleh lebih dari 50 karakter.',
+            'name.regex' => 'Nama hanya boleh mengandung huruf dan spasi.',
+
+            // Pesan untuk kolom 'email'
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+
+            // Pesan untuk kolom 'password'
+            'password.required' => 'Password wajib diisi.',
+            'password.string' => 'Password harus berupa teks.',
+            'password.same' => 'Password dan konfirmasi password tidak cocok.',
+
+            // Pesan untuk kolom 'roles'
+            'roles.exists' => 'Role yang dipilih tidak valid.',
+
+            // Pesan untuk kolom 'username'
+            'username.min' => 'Username harus memiliki minimal 3 karakter.',
+            'username.max' => 'Username tidak boleh lebih dari 30 karakter.',
+            'username.unique' => 'Username sudah digunakan.',
+            'username.regex' => 'Username tidak boleh mengandung spasi.',
+
+            // Pesan untuk kolom 'nik'
+            'nik.size' => 'NIK harus terdiri dari 16 angka.',
+            'nik.regex' => 'NIK hanya boleh berupa angka.',
+            'nik.unique' => 'NIK sudah terdaftar.',
+
+            // Pesan untuk kolom 'phone'
+            'phone.string' => 'Nomor telepon harus berupa teks.',
+            'phone.regex' => 'Nomor telepon harus terdiri dari 10 hingga 13 angka.',
+
+            // Pesan untuk kolom 'gender'
+            'gender.in' => 'Jenis kelamin hanya boleh "pria" atau "wanita".',
+
+            // Pesan untuk kolom 'pin'
+            'pin.string' => 'PIN harus berupa teks.',
+            'pin.size' => 'PIN harus terdiri dari 6 angka.',
+            'pin.regex' => 'PIN hanya boleh berupa angka.',
+
+            // Pesan untuk kolom 'tags'
+            'tags.array' => 'Tags harus berupa array.',
+            'tags.*.exists' => 'Tag yang dipilih tidak valid.',
         ]);
 
         DB::beginTransaction();

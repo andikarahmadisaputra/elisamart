@@ -49,6 +49,8 @@ class PermissionTableSeeder extends Seeder
             'payment_request.list',
             'payment_request.create',
             'payment_request.edit',
+            'payment_request.cancel',
+            'payment_request.payment',
             'report_user.list',
             'report_topup_store.list',
             'report_topup_user.list',

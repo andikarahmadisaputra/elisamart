@@ -21,6 +21,7 @@ class CreateAdminUserSeeder extends Seeder
             'email' => 'andikars811@gmail.com',
             'password' => bcrypt('P@ssw0rd'),
             'nik' => '3315142601960001',
+            'username' => 'andikars811',
             'gender' => 'pria',
             'pin' => bcrypt('123456'),
         ]);

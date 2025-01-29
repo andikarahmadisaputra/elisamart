@@ -59,7 +59,7 @@ class PaymentRequest extends Model
     }
 
     protected $fillable = [
-        'store_id', 'user_id', 'amount', 'status', 'voucher', 'note'
+        'bon_number', 'store_id', 'user_id', 'amount', 'status', 'voucher', 'note'
     ];
 
     public function createdBy()
@@ -80,5 +80,11 @@ class PaymentRequest extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function lockUserAndStore()
+    {
+        $this->user()->lockForUpdate()->first();
+        $this->store()->lockForUpdate()->first();
     }
 }

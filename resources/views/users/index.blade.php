@@ -31,7 +31,7 @@
                 <th>{{ __('master.user.table.email') }}</th>
                 <th>{{ __('master.user.table.role') }}</th>
                 <th>{{ __('master.user.table.tag') }}</th>
-                <th>{{ __('master.user.table.nia') }}</th>
+                <th>{{ __('master.user.table.username') }}</th>
                 <th>{{ __('master.user.table.nik') }}</th>
                 <th>{{ __('master.user.table.gender') }}</th>
                 <th>{{ __('master.user.table.phone') }}</th>
@@ -64,7 +64,7 @@
                     @endif
                 </td>
                 <td>
-                    <div class="text-truncate" title="{{ $user->nia }}">{{ $user->nia }}</div>
+                    <div class="text-truncate" title="{{ $user->username }}">{{ $user->username }}</div>
                 </td>
                 <td>
                     <div class="text-truncate" title="{{ $user->nik }}">{{ $user->nik }}</div>

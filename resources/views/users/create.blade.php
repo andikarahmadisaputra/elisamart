@@ -77,7 +77,7 @@
         {{-- Role Selection --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <label for="roles"><strong>{{ __('master.user.form.role') }}:</strong></label>
+                <label for="roles"><strong>{{ __('master.user.form.role') }}:</strong><span class="text-muted">(Optional)</span></label>
                 <select name="roles[]" id="roles" class="form-control @error('roles') is-invalid @enderror" multiple>
                     @foreach ($roles as $value => $label)
                         <option value="{{ $value }}" {{ collect(old('roles'))->contains($value) ? 'selected' : '' }}>
@@ -91,14 +91,14 @@
             </div>
         </div>
 
-        {{-- NIA Input --}}
+        {{-- Username Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <label for="nia"><strong>{{ __('master.user.form.nia') }}:</strong></label>
-                <input type="text" id="nia" name="nia" placeholder="NIA"
-                       class="form-control @error('nia') is-invalid @enderror"
-                       value="{{ old('nia') }}">
-                @error('nia')
+                <label for="nia"><strong>{{ __('master.user.form.username') }}:</strong><span class="text-muted">(Optional)</span></label>
+                <input type="text" id="username" name="username" placeholder="Username"
+                       class="form-control @error('username') is-invalid @enderror"
+                       value="{{ old('username') }}">
+                @error('username')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
@@ -107,7 +107,7 @@
         {{-- NIK Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <label for="nik"><strong>{{ __('master.user.form.nik') }}:</strong></label>
+                <label for="nik"><strong>{{ __('master.user.form.nik') }}:</strong><span class="text-muted">(Optional)</span></label>
                 <input type="text" id="nik" name="nik" placeholder="NIK"
                        class="form-control @error('nik') is-invalid @enderror"
                        value="{{ old('nik') }}">
@@ -120,7 +120,7 @@
         {{-- Gender Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <label><strong>{{ __('master.user.form.gender') }}:</strong></label>
+                <label><strong>{{ __('master.user.form.gender') }}:</strong><span class="text-muted">(Optional)</span></label>
                 <div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="gender" id="male" value="pria"
@@ -142,7 +142,7 @@
         {{-- Phone Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <label for="phone"><strong>{{ __('master.user.form.phone') }}:</strong></label>
+                <label for="phone"><strong>{{ __('master.user.form.phone') }}:</strong><span class="text-muted">(Optional)</span></label>
                 <input type="text" id="phone" name="phone" placeholder="Phone"
                        class="form-control @error('phone') is-invalid @enderror"
                        value="{{ old('phone') }}">
@@ -155,7 +155,7 @@
         {{-- PIN Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <label for="pin"><strong>{{ __('master.user.form.pin') }}:</strong></label>
+                <label for="pin"><strong>{{ __('master.user.form.pin') }}:</strong><span class="text-muted">(Optional)</span></label>
                 <input type="text" id="pin" name="pin" placeholder="PIN"
                        class="form-control @error('pin') is-invalid @enderror"
                        value="{{ old('pin') }}">
@@ -168,7 +168,7 @@
         {{-- Tags Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
-                <label><strong>{{ __('master.user.form.tag') }}:</strong></label>
+                <label><strong>{{ __('master.user.form.tag') }}:</strong><span class="text-muted">(Optional)</span></label>
                 <div>
                     @foreach($tags as $tag)
                         <div class="form-check">

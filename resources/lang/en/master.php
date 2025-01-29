@@ -26,6 +26,7 @@ return [
             'no' => 'No',
             'name' => 'Name',
             'email' => 'Email',
+            'username' => 'Username',
             'role' => 'Role',
             'tag' => 'Tag',
             'nik' => 'NIK',

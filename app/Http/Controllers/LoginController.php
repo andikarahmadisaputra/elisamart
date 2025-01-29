@@ -23,16 +23,7 @@ class LoginController extends Controller
         $password = $request->input('password');
 
         // Tentukan field berdasarkan format identifier
-        $field = filter_var($identifier, FILTER_VALIDATE_EMAIL) 
-            ? 'email' 
-            : (strlen($identifier) === 16 && ctype_digit($identifier) 
-                ? 'nik' 
-                : 'nia');
-
-        // Validasi format NIA
-        if ($field === 'nia' && !preg_match('/^\d+(\.\d+)*$/', $identifier)) {
-            return back()->withErrors(['identifier' => 'Format NIA tidak valid.'])->withInput();
-        }
+        $field = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         // Autentikasi berdasarkan field yang ditemukan
         if (Auth::attempt([$field => $identifier, 'password' => $password])) {
