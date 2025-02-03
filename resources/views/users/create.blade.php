@@ -2,12 +2,12 @@
 
 @section('content')
 <div class="row">
-    <div class="col-lg-12 margin-tb">
-        <div class="pull-left">
+    <div class="d-flex justify-content-between mb-2">
+        <div>
             <h2>{{ __('master.user.create.title') }}</h2>
         </div>
-        <div class="pull-right">
-            <a class="btn btn-primary btn-sm mb-2" href="{{ route('users.index') }}"><i class="fa fa-arrow-left"></i> {{ __('master.user.button.cancel') }}</a>
+        <div>
+            <a class="btn btn-primary btn-sm" href="{{ route('users.index') }}"><i class="bi-x-circle"></i> {{ __('master.user.button.cancel') }}</a>
         </div>
     </div>
 </div>
@@ -188,7 +188,7 @@
         {{-- Submit Button --}}
         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
             <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3">
-                <i class="fa-solid fa-floppy-disk"></i> {{ __('master.user.button.submit') }}
+                <i class="bi-save"></i> {{ __('master.user.button.submit') }}
             </button>
         </div>
     </div>

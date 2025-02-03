@@ -16,9 +16,11 @@ use App\Models\User;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [LoginController::class, 'login']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 
 Route::group(['middleware' => ['auth']], function() {
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
     Route::get('/', [MemberController::class, 'index'])->name('member.index');
     Route::get('profile', [MemberController::class, 'profile'])->name('member.profile');
     Route::get('pin', [MemberController::class, 'pin'])->name('member.pin');
@@ -39,6 +41,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('admin/users', UserController::class);
     Route::resource('admin/tags', TagController::class);
     Route::resource('admin/stores', StoreController::class);
+    
+    Route::get('users-export', [UserController::class, 'export'])->name('users.export');
+    Route::post('users-import', [UserController::class, 'import'])->name('users.import');
 
     Route::get('/admin', [HomeController::class, 'index'])->name('admin');
     Route::get('admin/topup_store', [TopupStoreController::class, 'index'])->name('topup_store.index');

@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\UsersExport;
+use App\Imports\UsersImport;
 
 class UserController extends Controller
 {
@@ -26,6 +29,8 @@ class UserController extends Controller
          $this->middleware('permission:user.create', ['only' => ['create','store']]);
          $this->middleware('permission:user.edit', ['only' => ['edit','update']]);
          $this->middleware('permission:user.delete', ['only' => ['destroy']]);
+         $this->middleware('permission:user.import', ['only' => ['import']]);
+         $this->middleware('permission:user.export', ['only' => ['export']]);
     }
 
     /**
@@ -253,4 +258,46 @@ class UserController extends Controller
         return redirect()->route('users.index')
                         ->with('success','User deleted successfully');
     }
+
+    /**
+    * @return \Illuminate\Support\Collection
+    */
+    public function export() 
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
+         
+    /**
+    * @return \Illuminate\Support\Collection
+    */
+    public function import(Request $request) 
+    {
+        // Menetapkan waktu eksekusi maksimum untuk 5 menit (300 detik)
+        ini_set('max_execution_time', 300);
+
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv|max:2048',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            Excel::import(new UsersImport, $request->file('file'));
+
+            // Melakukan batch insert jika ada data yang tersisa
+            if (!empty($users)) {
+                User::insert($users);  // Insert data batch terakhir
+            }
+
+            DB::commit();
+            return back()->with('success', 'Users imported successfully.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            DB::rollback();
+            return back()->with('failure', $e->failures());
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
 }
