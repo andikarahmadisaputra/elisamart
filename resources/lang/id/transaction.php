@@ -104,9 +104,24 @@ return [
         ],
     ],
     'topup_user' => [
-        'button' => [
-            'back' => 'Kembali'
+        'create_by_tag' => [
+            'title' => 'Isi Ulang Saldo Pengguna Berdasarkan Label',
         ],
+        'create_by_user' => [
+            'title' => 'Isi Ulang Saldo Pengguna',
+        ],
+        'button' => [
+            'back' => 'Kembali',
+            'submit' => 'Proses',
+            'cancel' => 'Batal',
+        ],
+        'form' => [
+            'store' => 'Toko',
+            'user' => 'Email / Username Pengguna',
+            'tag' => 'Label',
+            'amount' => 'Jumlah',
+            'note' => 'Catatan',
+        ]
     ],
     'payment_request' => [
         'index' => [

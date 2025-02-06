@@ -40,7 +40,7 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $data = User::with('tags')->select('id', 'name', 'email', 'username', 'nik', 'phone', 'gender', 'balance')->orderBy('name')->paginate(20);
+        $data = User::withTrashed()->with('tags')->select('id', 'name', 'email', 'username', 'nik', 'phone', 'gender', 'balance')->orderBy('name')->paginate(20);
   
         return view('users.index',compact('data'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
@@ -165,11 +165,9 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id): View
+    public function show(User $user): View
     {
-        $user = User::find($id);
-
-        return view('users.show',compact('user'));
+        return view('users.show', compact('user'));
     }
     
     /**
@@ -178,15 +176,18 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id): View
+    public function edit(User $user): View
     {
-        $user = User::find($id);
-        $roles = Role::pluck('name','name')->all();
-        $userRole = $user->roles->pluck('name','name')->all();
-        $tags = Tag::all();
+        // Ambil user dengan relasi untuk mengurangi query tambahan
+        $user->load(['roles', 'tags']);
+
+        // Ambil roles dalam bentuk array langsung
+        $roles = Role::pluck('name', 'name')->toArray();
+        $userRole = $user->roles->pluck('name')->toArray();
+        $tags = Tag::select('id', 'name')->get();
         $selectedTags = $user->tags->pluck('id')->toArray();
-    
-        return view('users.edit',compact('user','roles','userRole', 'tags', 'selectedTags'));
+
+        return view('users.edit', compact('user', 'roles', 'userRole', 'tags', 'selectedTags'));
     }
     
     /**

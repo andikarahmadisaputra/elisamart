@@ -61,6 +61,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('admin/topup_user/create_by_tag', [TopupUserController::class, 'createByTag'])->name('topup_user.create_by_tag');
     Route::get('admin/topup_user/create_by_user', [TopupUserController::class, 'createByUser'])->name('topup_user.create_by_user');
     Route::post('admin/topup_user/store_by_tag', [TopupUserController::class, 'storeByTag'])->name('topup_user.store_by_tag');
+    Route::post('admin/topup_user/store_by_user', [TopupUserController::class, 'storeByUser'])->name('topup_user.store_by_user');
     Route::get('admin/topup_store/{topupUserHeader}/edit', [TopupUserController::class, 'edit'])->name('topup_user.edit');
     Route::patch('admin/topup_user/{topupUserHeader}/cancel', [TopupUserController::class, 'cancel'])->name('topup_user.cancel');
     Route::patch('admin/topup_user/{topupUserHeader}/under_review', [TopupUserController::class, 'underReview'])->name('topup_user.under_review');
