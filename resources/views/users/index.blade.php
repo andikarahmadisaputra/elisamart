@@ -78,6 +78,9 @@
                 <th>{{ __('master.user.table.gender') }}</th>
                 <th>{{ __('master.user.table.phone') }}</th>
                 <th>{{ __('master.user.table.balance') }}</th>
+                <th>{{ __('master.user.table.created_at') }}</th>
+                <th>{{ __('master.user.table.updated_at') }}</th>
+                <th>{{ __('master.user.table.deleted_at') }}</th>
                 <th width="280px">{{ __('master.user.table.action') }}</th>
             </tr>
         </thead>
@@ -119,6 +122,15 @@
                 </td>
                 <td>Rp {{ number_format($user->balance, 0, ',', '.') }}</td>
                 <td>
+                    <div class="text-truncate" title="{{ $user->created_at }}">{{ $user->created_at }}</div>
+                </td>
+                <td>
+                    <div class="text-truncate" title="{{ $user->updated_at }}">{{ $user->updated_at }}</div>
+                </td>
+                <td>
+                    <div class="text-truncate" title="{{ $user->deleted_at }}">{{ $user->deleted_at }}</div>
+                </td>
+                <td>
                     @can('user.show')
                     <a class="btn btn-info btn-sm" href="{{ route('users.show',$user->id) }}">
                         <i class="bi-eye"></i> {{ __('master.user.button.show') }}
@@ -128,16 +140,27 @@
                     <a class="btn btn-warning btn-sm" href="{{ route('users.edit',$user->id) }}">
                         <i class="bi-pencil-square"></i> {{ __('master.user.button.edit') }}
                     </a>
-                    @endcan
-                    @can('user.delete')
-                    <form method="POST" action="{{ route('users.destroy', $user->id) }}" style="display:inline" id="delete-form-{{ $user->id }}">
-                        @csrf
-                        @method('DELETE')
-                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $user->id }})">
-                            <i class="bi-trash"></i> {{ __('master.user.button.delete') }}
-                        </button>
-                    </form>
-                    @endcan
+                    @if ($user->trashed())
+                        @can('user.restore')
+                        <form method="POST" action="{{ route('users.restore', $user->id) }}" style="display:inline" id="restore-form-{{ $user->id }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmRestore({{ $user->id }})">
+                                <i class="bi-arrow-counterclockwise"></i> {{ __('master.user.button.restore') }}
+                            </button>
+                        </form>
+                        @endcan
+                    @else
+                        @can('user.delete')
+                        <form method="POST" action="{{ route('users.destroy', $user->id) }}" style="display:inline" id="delete-form-{{ $user->id }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $user->id }})">
+                                <i class="bi-trash"></i> {{ __('master.user.button.delete') }}
+                            </button>
+                        </form>
+                        @endcan
+                    @endif
                 </td>
             </tr>
         @endforeach
@@ -153,6 +176,14 @@
         if (confirm("Yakin akan hapus?")) {
             // Jika ya, kirim form
             document.getElementById('delete-form-' + userId).submit();
+        }
+    }
+
+    function confirmRestore(userId) {
+        // Tampilkan konfirmasi sebelum merestore
+        if (confirm("Yakin akan dipulihkan?")) {
+            // Jika ya, kirim form
+            document.getElementById('restore-form-' + userId).submit();
         }
     }
 </script>

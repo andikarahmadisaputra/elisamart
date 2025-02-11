@@ -23,6 +23,7 @@ return [
             'submit' => 'Simpan',
             'import' => 'Unggah',
             'export' => 'Export',
+            'restore' => 'Pulihkan',
         ],
         'table' => [
             'no' => 'No',
@@ -40,6 +41,7 @@ return [
         'form' => [
             'name' => 'Nama',
             'email' => 'Email',
+            'username' => 'Username',
             'password' => 'Kata Sandi',
             'confirm_password' => 'Konfirmasi Kata Sandi',
             'role' => 'Hak Akses',

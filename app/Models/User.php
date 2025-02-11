@@ -9,10 +9,16 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Foundation\Auth\Access\Authorizable;
 
-class User extends Authenticatable
+/**
+ * @method bool can(string $ability, mixed $arguments = [])
+ */
+
+class User extends Authenticatable implements AuthorizableContract
 {
-    use HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasFactory, Notifiable, HasRoles, SoftDeletes, Authorizable;
 
     protected static function boot()
     {
@@ -45,8 +51,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
         'password',
-        'nia',
         'nik',
         'phone',
         'gender',

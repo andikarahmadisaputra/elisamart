@@ -52,6 +52,7 @@
                 <input type="password" name="confirm-password" placeholder="Confirm Password" class="form-control">
             </div>
         </div>
+        @can('user.assign_role')
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>{{ __('master.user.form.role') }}:</strong>
@@ -64,6 +65,7 @@
                 </select>
             </div>
         </div>
+        @endcan
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
                 <strong>{{ __('master.user.form.nik') }}:</strong>

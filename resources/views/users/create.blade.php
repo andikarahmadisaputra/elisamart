@@ -74,6 +74,7 @@
             </div>
         </div>
 
+        @can('user.assign_role')
         {{-- Role Selection --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group">
@@ -90,6 +91,7 @@
                 @enderror
             </div>
         </div>
+        @endcan
 
         {{-- Username Input --}}
         <div class="col-xs-12 col-sm-12 col-md-12">
@@ -157,8 +159,7 @@
             <div class="form-group">
                 <label for="pin"><strong>{{ __('master.user.form.pin') }}:</strong><span class="text-muted">(Optional)</span></label>
                 <input type="text" id="pin" name="pin" placeholder="PIN"
-                       class="form-control @error('pin') is-invalid @enderror"
-                       value="{{ old('pin') }}">
+                       class="form-control @error('pin') is-invalid @enderror">
                 @error('pin')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror

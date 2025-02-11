@@ -42,8 +42,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('admin/tags', TagController::class);
     Route::resource('admin/stores', StoreController::class);
     
-    Route::get('users-export', [UserController::class, 'export'])->name('users.export');
-    Route::post('users-import', [UserController::class, 'import'])->name('users.import');
+    Route::get('admin/users/export', [UserController::class, 'export'])->name('users.export');
+    Route::post('admin/users/import', [UserController::class, 'import'])->name('users.import');
+    Route::patch('admin/users/restore', [UserController::class, 'restore'])->name('users.restore');
 
     Route::get('/admin', [HomeController::class, 'index'])->name('admin');
     Route::get('admin/topup_store', [TopupStoreController::class, 'index'])->name('topup_store.index');

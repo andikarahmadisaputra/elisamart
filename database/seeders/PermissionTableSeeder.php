@@ -30,6 +30,7 @@ class PermissionTableSeeder extends Seeder
             'user.delete',
             'user.import',
             'user.export',
+            'user.assign_role',
             'store.list',
             'store.create',
             'store.edit',

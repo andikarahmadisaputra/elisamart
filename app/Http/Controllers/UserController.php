@@ -15,6 +15,9 @@ use Illuminate\Http\RedirectResponse;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\UsersExport;
 use App\Imports\UsersImport;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -40,7 +43,7 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $data = User::withTrashed()->with('tags')->select('id', 'name', 'email', 'username', 'nik', 'phone', 'gender', 'balance')->orderBy('name')->paginate(20);
+        $data = User::withTrashed()->with('tags')->select('id', 'name', 'email', 'username', 'nik', 'phone', 'gender', 'balance', 'created_at', 'updated_at', 'deleted_at')->orderBy('name')->paginate(20);
   
         return view('users.index',compact('data'))
             ->with('i', ($request->input('page', 1) - 1) * 20);
@@ -62,16 +65,16 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      *
+     * @method bool can(string $ability, mixed $arguments = [])
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request): RedirectResponse
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:50|regex:/^[a-zA-Z\s]+$/',
+            'name' => "required|string|max:50|regex:/^[A-Za-z'.\s]+$/",
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|same:confirm-password',
-            'roles' => 'nullable|exists:roles,name',
+            'password' => 'required|string|min:6|same:confirm-password',
             'username' => 'nullable|min:3|max:30|unique:users,username|regex:/^\S*$/',
             'nik' => 'nullable|size:16|regex:/^[0-9]+$/|unique:users,nik',
             'phone' => 'nullable|string|regex:/^\d{10,13}$/',
@@ -79,6 +82,8 @@ class UserController extends Controller
             'pin' => 'nullable|string|size:6|regex:/^[0-9]+$/',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
+            'roles' => 'nullable|array',
+            'roles.*' => 'exists:roles,name',
         ],[
             // Pesan untuk kolom 'name'
             'name.required' => 'Nama wajib diisi.',
@@ -94,10 +99,8 @@ class UserController extends Controller
             // Pesan untuk kolom 'password'
             'password.required' => 'Password wajib diisi.',
             'password.string' => 'Password harus berupa teks.',
+            'password.min' => 'Password minimal 6 karakter',
             'password.same' => 'Password dan konfirmasi password tidak cocok.',
-
-            // Pesan untuk kolom 'roles'
-            'roles.exists' => 'Role yang dipilih tidak valid.',
 
             // Pesan untuk kolom 'username'
             'username.min' => 'Username harus memiliki minimal 3 karakter.',
@@ -127,19 +130,34 @@ class UserController extends Controller
             'tags.*.exists' => 'Tag yang dipilih tidak valid.',
         ]);
 
+        if (Auth::check() && Auth::user()->can('user.assign_role')) {
+            $roleData = $request->validate([
+                'roles' => 'nullable|exists:roles,name',
+            ],[
+                'roles.exists' => 'Role yang dipilih tidak valid.',
+            ]);
+
+            $validatedData['roles'] = $roleData['roles'] ?? null;
+        }
+
         DB::beginTransaction();
 
         try {
-            // Encrypt sensitive fields
-            $validatedData['password'] = bcrypt($validatedData['password']);
-            if (!empty($validatedData['pin'])) {
-                $validatedData['pin'] = bcrypt($validatedData['pin']);
-            }
-        
-            // Create user and assign role
-            $user = User::create($validatedData);
-            if (!empty($validatedData['roles'])) {
-                $user->assignRole($validatedData['roles']);
+            // Laravel akan otomatis menghash password, jadi tidak perlu bcrypt()
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'username' => $validatedData['username'] ?? '',
+                'password' => $validatedData['password'], // Laravel akan otomatis hash
+                'nik' => $validatedData['nik'],
+                'phone' => $validatedData['phone'],
+                'gender' => $validatedData['gender'],
+                'pin' => !empty($validatedData['pin']) ? Hash::make($validatedData['pin']) : null,
+            ]);
+
+            // Assign role
+            if (Auth::check() && Auth::user()->can('user.assign_role') && !empty($validatedData['roles'])) {
+                $user->syncRoles($validatedData['roles']);
             }
 
             // Sync tags if provided
@@ -153,8 +171,16 @@ class UserController extends Controller
                 ->with('success','User created successfully');
         } catch (\Exception $e) {
             DB::rollBack();
+
+            // Log error
+            Log::error('Failed to create user', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user' => Auth::user() ? Auth::user()->id : null,
+            ]);
+
             return redirect()->back()
-                ->withInput($request->all()) // Return input values
+                ->withInput($request->except(['password', 'pin']))
                 ->withErrors(['error' => 'Failed to create user: ' . $e->getMessage()]);
         }
     }
@@ -200,21 +226,65 @@ class UserController extends Controller
     public function update(Request $request, $id): RedirectResponse
     {
         $this->validate($request, [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,'.$id,
-            'password' => 'nullable|string|same:confirm-password',
-            'roles' => 'required',
-            'nik' => 'nullable|unique:users,nik,'.$id,
+            'name' => "required|string|max:50|regex:/^[A-Za-z'.\s]+$/",
+            'email' => 'required|email|unique:users,email'.$id,
+            'password' => 'nullable|string|min:6|same:confirm-password',
+            'username' => 'nullable|min:3|max:30|regex:/^\S*$/|unique:users,username'.$id,
+            'nik' => 'nullable|size:16|regex:/^[0-9]+$/|unique:users,nik'.$id,
             'phone' => 'nullable|string|regex:/^\d{10,13}$/',
             'gender' => 'nullable|in:pria,wanita',
             'pin' => 'nullable|string|size:6|regex:/^[0-9]+$/',
-            'tags' => 'array',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
+            'roles' => 'nullable|array',
+            'roles.*' => 'exists:roles,name',
+        ],[
+            // Pesan untuk kolom 'name'
+            'name.required' => 'Nama wajib diisi.',
+            'name.string' => 'Nama harus berupa teks.',
+            'name.max' => 'Nama tidak boleh lebih dari 50 karakter.',
+            'name.regex' => 'Nama hanya boleh mengandung huruf, spasi, titik dan petik.',
+
+            // Pesan untuk kolom 'email'
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+
+            // Pesan untuk kolom 'password'
+            'password.string' => 'Password harus berupa teks.',
+            'password.min' => 'Password minimal 6 karakter',
+            'password.same' => 'Password dan konfirmasi password tidak cocok.',
+
+            // Pesan untuk kolom 'username'
+            'username.min' => 'Username harus memiliki minimal 3 karakter.',
+            'username.max' => 'Username tidak boleh lebih dari 30 karakter.',
+            'username.unique' => 'Username sudah digunakan.',
+            'username.regex' => 'Username tidak boleh mengandung spasi.',
+
+            // Pesan untuk kolom 'nik'
+            'nik.size' => 'NIK harus terdiri dari 16 angka.',
+            'nik.regex' => 'NIK hanya boleh berupa angka.',
+            'nik.unique' => 'NIK sudah terdaftar.',
+
+            // Pesan untuk kolom 'phone'
+            'phone.string' => 'Nomor telepon harus berupa teks.',
+            'phone.regex' => 'Nomor telepon harus terdiri dari 10 hingga 13 angka.',
+
+            // Pesan untuk kolom 'gender'
+            'gender.in' => 'Jenis kelamin hanya boleh "pria" atau "wanita".',
+
+            // Pesan untuk kolom 'pin'
+            'pin.string' => 'PIN harus berupa teks.',
+            'pin.size' => 'PIN harus terdiri dari 6 angka.',
+            'pin.regex' => 'PIN hanya boleh berupa angka.',
+
+            // Pesan untuk kolom 'tags'
+            'tags.array' => 'Tags harus berupa array.',
+            'tags.*.exists' => 'Tag yang dipilih tidak valid.',
         ]);
     
         $input = $request->all();
-        if(!empty($input['password'])){ 
-            $input['password'] = bcrypt($input['password']);
-        }else{
+        if(empty($input['password'])){ 
             $input = Arr::except($input,array('password'));    
         }
 
@@ -234,16 +304,22 @@ class UserController extends Controller
             $input = Arr::except($input,array('nik'));
         }
 
+        // Update data user
         $user->update($input);
-        DB::table('model_has_roles')->where('model_id',$id)->delete();
-    
-        $user->assignRole($request->input('roles'));
+
+        // Update Role and Permissions
+        if (Auth::check() && Auth::user()->can('user.assign_role') && !empty($validatedData['roles'])) {
+            DB::table('model_has_roles')->where('model_id',$id)->delete();
+        
+            $user->assignRole($request->input('roles'));
+        }
+        
         if ($request->has('tags')) {
             $user->tags()->sync($request->tags);
         }
     
         return redirect()->route('users.index')
-                        ->with('success','User updated successfully');
+            ->with('success','User updated successfully');
     }
     
     /**
@@ -258,6 +334,13 @@ class UserController extends Controller
         DB::table('model_has_roles')->where('model_id',$id)->delete();
         return redirect()->route('users.index')
                         ->with('success','User deleted successfully');
+    }
+
+    public function restore($id): RedirectResponse
+    {
+        $user = User::withTrashed()->find($id);
+        $user->restore();
+        return redirect()->route('user.index')->with('success', 'User restore successfully');
     }
 
     /**
